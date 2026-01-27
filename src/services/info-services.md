@@ -1,0 +1,1 @@
+# Tempat menaruh Logic Model

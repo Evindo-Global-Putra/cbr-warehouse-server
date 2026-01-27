@@ -1,0 +1,54 @@
+# docker-compose.yml
+version: "3.8"
+
+services:
+  # PostgreSQL Development
+  postgres-dev:
+    image: postgres:16-alpine
+    container_name: cbr-postgres-dev
+    restart: unless-stopped
+    env_file:
+      - .env.docker
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secret}
+      POSTGRES_DB: ${POSTGRES_DB:-cbr-server-dev}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-dev-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cbr-network
+
+  # ElysiaJS App Development
+ app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cbr-app-dev
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    env_file:
+      - .env.local
+    depends_on:
+      postgres-dev:
+        condition: service_healthy
+    networks:
+      - cbr-network
+    volumes:
+      - ./src:/app/src
+      - ./drizzle:/app/drizzle
+    command: bun run --watch src/index.ts
+
+networks:
+  cbr-network:
+    driver: bridge
+
+volumes:
+  postgres-dev-data:
