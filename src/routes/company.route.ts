@@ -1,5 +1,5 @@
 import { Elysia, t } from "elysia";
-import { jwt } from "@elysiajs/jwt";
+// import { jwt } from "@elysiajs/jwt";
 import { db } from "../db";
 import { CompanyRepository } from "../repositories/company.repository";
 import { CompanyService } from "../services/company.service";
@@ -7,22 +7,22 @@ import { CompanyService } from "../services/company.service";
 const companyService = new CompanyService(new CompanyRepository(db));
 
 export const companyRoutes = new Elysia({ prefix: "/companies" })
-  .use(
-    jwt({
-      name: "jwt",
-      secret: process.env.JWT_SECRET!,
-    })
-  )
+  // .use(
+  //   jwt({
+  //     name: "jwt",
+  //     secret: process.env.JWT_SECRET!,
+  //   })
+  // )
   // ─── Auth guard ───────────────────────────────────────────────────────────
-  .derive(async ({ headers, jwt }) => {
-    const auth = headers["authorization"];
-    if (!auth?.startsWith("Bearer ")) throw new Error("Unauthorized");
-
-    const payload = await jwt.verify(auth.slice(7));
-    if (!payload) throw new Error("Unauthorized");
-
-    return { currentUser: payload };
-  })
+  // .derive(async ({ headers, jwt }) => {
+  //   const auth = headers["authorization"];
+  //   if (!auth?.startsWith("Bearer ")) throw new Error("Unauthorized");
+  //
+  //   const payload = await jwt.verify(auth.slice(7));
+  //   if (!payload) throw new Error("Unauthorized");
+  //
+  //   return { currentUser: payload };
+  // })
   // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {
     const message =

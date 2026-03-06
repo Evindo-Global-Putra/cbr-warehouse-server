@@ -1,5 +1,5 @@
 import { Elysia, t } from "elysia";
-import { jwt } from "@elysiajs/jwt";
+// import { jwt } from "@elysiajs/jwt";
 import { db } from "../db";
 import { BranchRepository } from "../repositories/branch.repository";
 import { BranchService } from "../services/branch.service";
@@ -7,25 +7,26 @@ import { BranchService } from "../services/branch.service";
 const branchService = new BranchService(new BranchRepository(db));
 
 export const branchRoutes = new Elysia({ prefix: "/branches" })
-  .use(
-    jwt({
-      name: "jwt",
-      secret: process.env.JWT_SECRET!,
-    })
-  )
+  // .use(
+  //   jwt({
+  //     name: "jwt",
+  //     secret: process.env.JWT_SECRET!,
+  //   }),
+  // )
   // ─── Auth guard (applies to all routes below) ─────────────────────────────
-  .derive(async ({ headers, jwt }) => {
-    const auth = headers["authorization"];
-    if (!auth?.startsWith("Bearer ")) throw new Error("Unauthorized");
-
-    const payload = await jwt.verify(auth.slice(7));
-    if (!payload) throw new Error("Unauthorized");
-
-    return { currentUser: payload };
-  })
+  // .derive(async ({ headers, jwt }) => {
+  //   const auth = headers["authorization"];
+  //   if (!auth?.startsWith("Bearer ")) throw new Error("Unauthorized");
+  //
+  //   const payload = await jwt.verify(auth.slice(7));
+  //   if (!payload) throw new Error("Unauthorized");
+  //
+  //   return { currentUser: payload };
+  // })
   // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {
-    const message = error instanceof Error ? error.message : "Internal server error";
+    const message =
+      error instanceof Error ? error.message : "Internal server error";
 
     if (message === "Unauthorized") {
       set.status = 401;
@@ -60,7 +61,7 @@ export const branchRoutes = new Elysia({ prefix: "/branches" })
     },
     {
       params: t.Object({ code: t.String() }),
-    }
+    },
   )
   // ─── GET /branches/:id ────────────────────────────────────────────────────
   .get(
@@ -71,7 +72,7 @@ export const branchRoutes = new Elysia({ prefix: "/branches" })
     },
     {
       params: t.Object({ id: t.Numeric() }),
-    }
+    },
   )
   // ─── POST /branches ───────────────────────────────────────────────────────
   .post(
@@ -88,7 +89,7 @@ export const branchRoutes = new Elysia({ prefix: "/branches" })
         address: t.Optional(t.String()),
         phone: t.Optional(t.String()),
       }),
-    }
+    },
   )
   // ─── PUT /branches/:id ────────────────────────────────────────────────────
   .put(
@@ -105,7 +106,7 @@ export const branchRoutes = new Elysia({ prefix: "/branches" })
         address: t.Optional(t.String()),
         phone: t.Optional(t.String()),
       }),
-    }
+    },
   )
   // ─── DELETE /branches/:id ─────────────────────────────────────────────────
   .delete(
@@ -116,5 +117,5 @@ export const branchRoutes = new Elysia({ prefix: "/branches" })
     },
     {
       params: t.Object({ id: t.Numeric() }),
-    }
+    },
   );

@@ -21,9 +21,11 @@
     "db:generate": "bun --env-file=.env.local drizzle-kit generate",
     "db:migrate": "bun --env-file=.env.local drizzle-kit migrate",
     "db:studio": "bun --env-file=.env.local drizzle-kit studio",
-    "db:psql": "docker exec -it cbr-postgres-dev psql -U postgres -d cbr-server-dev"
+    "db:psql": "docker exec -it cbr-postgres-dev psql -U postgres -d cbr-server-dev",
+    "db:seed": "bun --env-file=.env.local src/db/seed.ts"
   },
   "dependencies": {
+    "@elysiajs/cors": "^1.4.1",
     "@elysiajs/jwt": "^1.4.1",
     "@elysiajs/swagger": "^1.3.1",
     "dotenv": "^17.2.3",
