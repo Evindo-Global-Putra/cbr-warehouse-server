@@ -15,6 +15,10 @@ import { exportOrderItemRoutes } from "./routes/export-order-item.route";
 import { exportOrderMotorcycleRoutes } from "./routes/export-order-motorcycle.route";
 import { loadingFormRoutes } from "./routes/loading-form.route";
 import { shipmentRoutes } from "./routes/shipment.route";
+import { invoiceRoutes } from "./routes/invoice.route";
+import { paymentRoutes } from "./routes/payment.route";
+import { warehouseTransferRoutes } from "./routes/warehouse-transfer.route";
+import { warehouseTransferMotorcycleRoutes } from "./routes/warehouse-transfer-motorcycle.route";
 
 const app = new Elysia()
   .use(cors())
@@ -43,7 +47,11 @@ const app = new Elysia()
       .use(exportOrderItemRoutes)
       .use(exportOrderMotorcycleRoutes)
       .use(loadingFormRoutes)
-      .use(shipmentRoutes),
+      .use(shipmentRoutes)
+      .use(invoiceRoutes)
+      .use(paymentRoutes)
+      .use(warehouseTransferRoutes)
+      .use(warehouseTransferMotorcycleRoutes),
   )
   .listen(process.env.PORT ?? 3000);
 

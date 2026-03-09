@@ -78,7 +78,11 @@ export const shipmentRoutes = new Elysia({ prefix: "/shipments" })
   .post(
     "/",
     async ({ body, set }) => {
-      const data = await shipmentService.create(body);
+      const { estimatedArrival, ...rest } = body;
+      const data = await shipmentService.create({
+        ...rest,
+        estimatedArrival: estimatedArrival ? new Date(estimatedArrival) : undefined,
+      });
       set.status = 201;
       return { success: true, data };
     },
@@ -127,7 +131,11 @@ export const shipmentRoutes = new Elysia({ prefix: "/shipments" })
   .put(
     "/:id",
     async ({ params, body }) => {
-      const data = await shipmentService.update(params.id, body);
+      const { estimatedArrival, ...rest } = body;
+      const data = await shipmentService.update(params.id, {
+        ...rest,
+        estimatedArrival: estimatedArrival ? new Date(estimatedArrival) : undefined,
+      });
       return { success: true, data };
     },
     {

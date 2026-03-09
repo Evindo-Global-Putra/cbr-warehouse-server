@@ -7,7 +7,7 @@ import { MotorcycleService } from "../services/motorcycle.service";
 
 const motorcycleService = new MotorcycleService(
   new MotorcycleRepository(db),
-  new WarehouseEntryRepository(db)
+  new WarehouseEntryRepository(db),
 );
 
 export const motorcycleRoutes = new Elysia({ prefix: "/motorcycles" })
@@ -21,10 +21,10 @@ export const motorcycleRoutes = new Elysia({ prefix: "/motorcycles" })
   // .derive(async ({ headers, jwt }) => {
   //   const auth = headers["authorization"];
   //   if (!auth?.startsWith("Bearer ")) throw new Error("Unauthorized");
-  //
+
   //   const payload = await jwt.verify(auth.slice(7));
   //   if (!payload) throw new Error("Unauthorized");
-  //
+
   //   return { currentUser: payload };
   // })
   // ─── Error handler ────────────────────────────────────────────────────────
@@ -74,7 +74,7 @@ export const motorcycleRoutes = new Elysia({ prefix: "/motorcycles" })
           t.Literal("transferred"),
         ]),
       }),
-    }
+    },
   )
   // ─── GET /motorcycles/branch/:branchId ────────────────────────────────────
   .get(
@@ -85,7 +85,7 @@ export const motorcycleRoutes = new Elysia({ prefix: "/motorcycles" })
     },
     {
       params: t.Object({ branchId: t.Numeric() }),
-    }
+    },
   )
   // ─── GET /motorcycles/entry/:entryId ──────────────────────────────────────
   .get(
@@ -96,7 +96,7 @@ export const motorcycleRoutes = new Elysia({ prefix: "/motorcycles" })
     },
     {
       params: t.Object({ entryId: t.Numeric() }),
-    }
+    },
   )
   // ─── GET /motorcycles/type/:typeId ────────────────────────────────────────
   .get(
@@ -107,7 +107,7 @@ export const motorcycleRoutes = new Elysia({ prefix: "/motorcycles" })
     },
     {
       params: t.Object({ typeId: t.Numeric() }),
-    }
+    },
   )
   // ─── GET /motorcycles/frame/:frameNumber ──────────────────────────────────
   .get(
@@ -118,18 +118,20 @@ export const motorcycleRoutes = new Elysia({ prefix: "/motorcycles" })
     },
     {
       params: t.Object({ frameNumber: t.String() }),
-    }
+    },
   )
   // ─── GET /motorcycles/engine/:engineNumber ────────────────────────────────
   .get(
     "/engine/:engineNumber",
     async ({ params }) => {
-      const data = await motorcycleService.getByEngineNumber(params.engineNumber);
+      const data = await motorcycleService.getByEngineNumber(
+        params.engineNumber,
+      );
       return { success: true, data };
     },
     {
       params: t.Object({ engineNumber: t.String() }),
-    }
+    },
   )
   // ─── GET /motorcycles/barcode/:barcode ────────────────────────────────────
   .get(
@@ -140,7 +142,7 @@ export const motorcycleRoutes = new Elysia({ prefix: "/motorcycles" })
     },
     {
       params: t.Object({ barcode: t.String() }),
-    }
+    },
   )
   // ─── GET /motorcycles/:id ─────────────────────────────────────────────────
   .get(
@@ -151,7 +153,7 @@ export const motorcycleRoutes = new Elysia({ prefix: "/motorcycles" })
     },
     {
       params: t.Object({ id: t.Numeric() }),
-    }
+    },
   )
   // ─── POST /motorcycles/scan ───────────────────────────────────────────────
   // Core warehouse entry action (Steps 3–6 in the mobile wizard).
@@ -185,7 +187,7 @@ export const motorcycleRoutes = new Elysia({ prefix: "/motorcycles" })
         enginePhotoUrl: t.Optional(t.String()),
         notes: t.Optional(t.String()),
       }),
-    }
+    },
   )
   // ─── PATCH /motorcycles/:id/status ────────────────────────────────────────
   // Transition: on_site → loading/transferred, loading → on_site/exported
@@ -205,7 +207,7 @@ export const motorcycleRoutes = new Elysia({ prefix: "/motorcycles" })
           t.Literal("transferred"),
         ]),
       }),
-    }
+    },
   )
   // ─── PUT /motorcycles/:id ─────────────────────────────────────────────────
   .put(
@@ -227,7 +229,7 @@ export const motorcycleRoutes = new Elysia({ prefix: "/motorcycles" })
         enginePhotoUrl: t.Optional(t.String()),
         notes: t.Optional(t.String()),
       }),
-    }
+    },
   )
   // ─── DELETE /motorcycles/:id ──────────────────────────────────────────────
   // Only on_site motorcycles can be deleted.
@@ -239,5 +241,5 @@ export const motorcycleRoutes = new Elysia({ prefix: "/motorcycles" })
     },
     {
       params: t.Object({ id: t.Numeric() }),
-    }
+    },
   );
