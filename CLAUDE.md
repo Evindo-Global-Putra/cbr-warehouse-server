@@ -159,6 +159,130 @@ This is a **B2B operation**. Clients (dealers/distributors) typically request **
 
 ---
 
+## Export Documents
+
+When an export order is finalized, the system generates two key documents: an **Invoice** and a **Packing List**. Both share the same invoice number and are tied to a single shipment.
+
+### Invoice
+
+The invoice is the primary billing document sent to the consignee (buyer). It contains pricing, quantity, and payment totals in USD.
+
+```
+┌────────────────────────────────────────────────────────────────────┐
+│                            INVOICE                                 │
+├────────────────────────────────────────────────────────────────────┤
+│                                                                    │
+│  SHIPPER         : PT. Cahaya Baru Retailindo                      │
+│                    Arcade Business Center 6th Floor Unit 6-03      │
+│                    Jl. Kapuk Muara Penjaringan, Jakarta Utara      │
+│                    DKI Jakarta, Indonesia                          │
+│                                                                    │
+│  CONSIGNEE       : [Client / Buyer name & address]                 │
+│                                                                    │
+│  INV NO.         : 09/CBR-IMS/IV/2025                              │
+│  DATE            : April 22, 2025                                  │
+│  VESSEL          : [Ship name]                                     │
+│  ETD             : [Estimated Time of Departure]                   │
+│  FROM            : [Origin port]                                   │
+│  TO              : [Destination port]                               │
+│                                                                    │
+├────────────────────────────────────────────────────────────────────┤
+│  DESCRIPTION OF GOODS         │  QTY  │  UNIT PRICE  │  AMOUNT    │
+├───────────────────────────────┼───────┼──────────────┼────────────┤
+│  YAMAHA NMAX NEO (KEY)        │  20   │  USD 1,700   │  USD 34,000│
+│  YAMAHA NMAX NEO (KEYLESS)    │  21   │  USD 1,770   │  USD 37,170│
+│  YAMAHA AEROX ALPHA STD       │   2   │  USD 1,490   │  USD 2,980 │
+│  YAMAHA AEROX ALPHA CYBERCITY │   2   │  USD 1,740   │  USD 3,480 │
+│  YAMAHA LEXI STANDARD         │   4   │  USD 1,190   │  USD 4,760 │
+│  YAMAHA GEAR ULTIMA           │   4   │  USD 1,040   │  USD 4,160 │
+│  YAMAHA XSR 155               │   2   │  USD 2,040   │  USD 4,080 │
+│  YAMAHA R25                   │   1   │  USD 3,915   │  USD 3,915 │
+│  HELMETS                      │  56   │  USD 10.00   │  USD 560   │
+│  FREIGHT                      │       │              │  USD 4,350 │
+├───────────────────────────────┼───────┼──────────────┼────────────┤
+│  TOTAL                        │  112  │              │ USD 99,455 │
+├───────────────────────────────────────────────────────────────────┤
+│  COUNTRY OF ORIGIN : INDONESIA                                    │
+│  SHIPPING TERM     : CNF BEIRUT                                   │
+│  SAY IN WORD       : Ninety Nine Thousand Four Hundred ...        │
+└───────────────────────────────────────────────────────────────────┘
+```
+
+#### Invoice Data Fields
+
+| Field                | Description                                             |
+| -------------------- | ------------------------------------------------------- |
+| INV NO.              | Invoice number with format: `NN/CBR-IMS/MM/YYYY`        |
+| Date                 | Invoice issue date                                      |
+| Vessel               | Ship/vessel name for the shipment                       |
+| ETD                  | Estimated Time of Departure                             |
+| From / To            | Origin and destination ports                            |
+| Description of Goods | Motorcycle model + variant (e.g., NMAX NEO KEY/KEYLESS) |
+| QTY                  | Quantity per item                                       |
+| Unit Price (USD)     | Price per unit in US Dollars                            |
+| Amount (USD)         | Line total (QTY × Unit Price)                           |
+| Helmets              | Bundled accessories (1 helmet per motorcycle)           |
+| Freight              | Shipping/freight cost                                   |
+| Shipping Term        | Incoterm (e.g., CNF — Cost and Freight)                 |
+| Country of Origin    | Always Indonesia                                        |
+| Total Payment        | Grand total in USD with amount in words                 |
+
+### Packing List
+
+The packing list accompanies the invoice and provides weight details for customs and logistics. It shares the same invoice number.
+
+```
+┌────────────────────────────────────────────────────────────────────┐
+│                          PACKING LIST                              │
+├────────────────────────────────────────────────────────────────────┤
+│                                                                    │
+│  SHIPPER / CONSIGNEE / INV NO. / DATE — same as Invoice            │
+│                                                                    │
+├────────────────────────────────────────────────────────────────────┤
+│  DESCRIPTION OF GOODS         │  QTY  │ GROSS WEIGHT │ NET WEIGHT │
+├───────────────────────────────┼───────┼──────────────┼────────────┤
+│  YAMAHA NMAX NEO (KEY)        │  20   │  2,660.00 KG │ 2,740.00  │
+│  YAMAHA NMAX NEO (KEYLESS)    │  21   │  2,793.00 KG │ 2,877.00  │
+│  YAMAHA AEROX ALPHA STD       │   2   │    266.00 KG │   274.00  │
+│  YAMAHA AEROX ALPHA CYBERCITY │   2   │    266.00 KG │   274.00  │
+│  YAMAHA LEXI STANDARD         │   4   │    524.00 KG │   539.00  │
+│  YAMAHA GEAR ULTIMA           │   4   │    532.00 KG │   548.00  │
+│  YAMAHA XSR 155               │   2   │    262.00 KG │   269.00  │
+│  YAMAHA R25                   │   1   │    131.00 KG │   134.00  │
+│  HELMETS                      │   7   │     14.00 KG │    16.44  │
+├───────────────────────────────┼───────┼──────────────┼────────────┤
+│  TOTAL                        │  63   │ 7,448.00 KG  │ 7,671.44  │
+├───────────────────────────────────────────────────────────────────┤
+│  SHIPPING TERM : CNF BEIRUT                                       │
+└───────────────────────────────────────────────────────────────────┘
+```
+
+#### Packing List Data Fields
+
+| Field        | Description                                                              |
+| ------------ | ------------------------------------------------------------------------ |
+| Description  | Same item list as Invoice                                                |
+| QTY          | Quantity per item (may differ from Invoice if helmets packed separately) |
+| Gross Weight | Total weight including packaging (KG)                                    |
+| Net Weight   | Product-only weight without packaging (KG)                               |
+| Total        | Sum of all quantities and weights                                        |
+
+### Document Relationship
+
+Both documents are linked by the same **Invoice Number** (e.g., `09/CBR-IMS/IV/2025`). The system generates them as a pair for each export shipment:
+
+```
+Export Order
+  │
+  ├── Invoice        → pricing, qty, payment total (USD)
+  └── Packing List   → qty, gross weight, net weight (KG)
+       │
+       └── Both share: INV NO., Date, Vessel, ETD, From/To,
+                       Shipper, Consignee, Item list
+```
+
+---
+
 ## Warehouse Entry Process (Mobile Flow)
 
 The warehouse entry is a **multi-step wizard** designed for mobile use, allowing the admin to process each motorcycle unit one by one:
@@ -327,22 +451,26 @@ Request
 
 Based on the business flow, the following core entities are expected:
 
-| Entity              | Description                                               |
-| ------------------- | --------------------------------------------------------- |
-| `users`             | System users (Admin Export, Admin Warehouse, etc.)        |
-| `companies`         | Company/branch data                                       |
-| `suppliers`         | Supplier information                                      |
-| `travel_permits`    | Surat Jalan / delivery notes from suppliers               |
-| `motorcycles`       | Individual motorcycle records (frame no, engine no, etc.) |
-| `accessories`       | Accessory inventory                                       |
-| `catalogs`          | Product catalog for available stock                       |
-| `warehouse_entries` | Incoming product entry records                            |
-| `loading_forms`     | Loading preparation for export                            |
-| `export_orders`     | Client export requests                                    |
-| `invoices`          | Invoice records for B2B clients                           |
-| `payments`          | Payment records and audit trail                           |
-| `shipments`         | Shipment tracking data                                    |
-| `branches`          | Warehouse locations (Jakarta, Surabaya, etc.)             |
+| Entity               | Description                                                |
+| -------------------- | ---------------------------------------------------------- |
+| `users`              | System users (Admin Export, Admin Warehouse, etc.)         |
+| `companies`          | Company/branch data                                        |
+| `suppliers`          | Supplier information                                       |
+| `branches`           | Warehouse locations (Jakarta, Surabaya, etc.)              |
+| `motorcycle_types`   | Catalog of motorcycle models (brand + model + cc)          |
+| `motorcycles`        | Individual units (frame no, engine no, barcode, photos)    |
+| `accessories`        | Accessory inventory (helmets, etc.)                        |
+| `travel_permits`     | Surat Jalan / delivery notes from suppliers                |
+| `warehouse_entries`  | Incoming product entry sessions (per travel permit)        |
+| `export_orders`      | Client export requests                                     |
+| `export_order_items` | Line items per export order (type, qty)                    |
+| `loading_forms`      | Loading preparation for export                             |
+| `invoices`           | Export invoices (INV NO, consignee, vessel, shipping term) |
+| `invoice_items`      | Invoice line items (description, qty, unit price, amount)  |
+| `packing_lists`      | Packing lists linked to invoices (weight summaries)        |
+| `packing_list_items` | Packing list line items (qty, gross weight, net weight)    |
+| `payments`           | Payment records and audit trail                            |
+| `shipments`          | Shipment tracking data (vessel, ETD, ports)                |
 
 ---
 
@@ -419,39 +547,14 @@ All endpoints follow RESTful conventions with versioned prefixes.
 
 ## Scripts
 
-### Development
-
-| Command              | Description                              |
-| -------------------- | ---------------------------------------- |
-| `bun run dev`        | Start development server (watch mode)    |
-
-### Docker
-
-| Command                    | Description                              |
-| -------------------------- | ---------------------------------------- |
-| `bun run docker:up`        | Start all Docker services                |
-| `bun run docker:down`      | Stop all Docker services                 |
-| `bun run docker:logs`      | Follow all Docker container logs         |
-| `bun run docker:clean`     | Stop services and remove volumes         |
-| `bun run docker:rebuild`   | Rebuild image and restart all services   |
-| `bun run docker:db:up`     | Start PostgreSQL container only          |
-| `bun run docker:db:down`   | Stop PostgreSQL container                |
-| `bun run docker:db:logs`   | Follow PostgreSQL container logs         |
-| `bun run docker:app:up`    | Start app container only                 |
-| `bun run docker:app:down`  | Stop app container                       |
-| `bun run docker:app:logs`  | Follow app container logs                |
-| `bun run docker:app:shell` | Open shell inside app container          |
-
-### Database
-
-| Command              | Description                              |
-| -------------------- | ---------------------------------------- |
-| `bun run db:test`    | Test database connectivity               |
-| `bun run db:push`    | Push schema directly to database         |
-| `bun run db:generate`| Generate migration files from schema     |
-| `bun run db:migrate` | Run pending migrations                   |
-| `bun run db:studio`  | Open Drizzle Studio (DB viewer)          |
-| `bun run db:psql`    | Connect to PostgreSQL via psql           |
+| Command                             | Description                |
+| ----------------------------------- | -------------------------- |
+| `bun run src/index.ts`              | Start development server   |
+| `bun run src/db/migrate.ts`         | Run database migrations    |
+| `bun run src/db/push.ts`            | Push schema to database    |
+| `bun run src/db/test-connection.ts` | Test database connectivity |
+| `bunx drizzle-kit generate`         | Generate migration files   |
+| `bunx drizzle-kit studio`           | Open Drizzle Studio        |
 
 ---
 

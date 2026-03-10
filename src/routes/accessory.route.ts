@@ -74,6 +74,8 @@ export const accessoryRoutes = new Elysia({ prefix: "/accessories" })
         quantityInStock: t.Optional(t.Number({ minimum: 0 })),
         unitCost: t.Optional(t.String()),
         unitPrice: t.Optional(t.String()),
+        grossWeightPerUnit: t.Optional(t.String()),
+        netWeightPerUnit: t.Optional(t.String()),
         branchId: t.Optional(t.Number()),
       }),
     }
@@ -108,6 +110,8 @@ export const accessoryRoutes = new Elysia({ prefix: "/accessories" })
         quantityInStock: t.Optional(t.Number({ minimum: 0 })),
         unitCost: t.Optional(t.String()),
         unitPrice: t.Optional(t.String()),
+        grossWeightPerUnit: t.Optional(t.Nullable(t.String())),
+        netWeightPerUnit: t.Optional(t.Nullable(t.String())),
         branchId: t.Optional(t.Number()),
       }),
     }

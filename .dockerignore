@@ -1,0 +1,31 @@
+# Dependencies (re-installed inside image)
+node_modules
+
+# Environment files (never bake secrets into the image)
+.env
+.env.local
+.env.*.local
+.env.docker
+.env.development
+.env.test
+.env.production
+
+# Version control
+.git
+.gitignore
+
+# Editor / OS
+.DS_Store
+.vscode
+.idea
+
+# Claude AI context
+.claude
+CLAUDE.md
+
+# Logs and temp files
+*.log
+*.trace
+
+# Docs (not needed at runtime)
+README.md

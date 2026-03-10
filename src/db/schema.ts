@@ -140,12 +140,13 @@ export const companies = pgTable("companies", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-// ─── Motorcycle Types (catalog: brand + model) ────────────────────────────────
+// ─── Motorcycle Types (catalog: brand + model + variant) ─────────────────────
 
 export const motorcycleTypes = pgTable("motorcycle_types", {
   id: serial("id").primaryKey(),
   brand: varchar("brand", { length: 100 }).notNull(), // Honda, Yamaha, Suzuki, Kawasaki
-  model: varchar("model", { length: 100 }).notNull(), // Beat Street, Aerox 155, NMAX
+  model: varchar("model", { length: 100 }).notNull(), // Beat Street, Aerox 155, NMAX NEO
+  variant: varchar("variant", { length: 100 }), // KEY, KEYLESS, STD, CYBERCITY, ALPHA, etc.
   engineCc: integer("engine_cc"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -232,6 +233,9 @@ export const accessories = pgTable("accessories", {
   quantityInStock: integer("quantity_in_stock").notNull().default(0),
   unitCost: numeric("unit_cost", { precision: 12, scale: 2 }),
   unitPrice: numeric("unit_price", { precision: 12, scale: 2 }),
+  // Weight per unit — used for packing list calculations
+  grossWeightPerUnit: numeric("gross_weight_per_unit", { precision: 8, scale: 2 }), // kg
+  netWeightPerUnit: numeric("net_weight_per_unit", { precision: 8, scale: 2 }), // kg
   branchId: integer("branch_id").references(() => branches.id),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -258,18 +262,23 @@ export const exportOrders = pgTable("export_orders", {
 });
 
 // ─── Export Order Items (type + quantity breakdown requested by the client) ───
+// Each line is either a motorcycle type or an accessory (e.g., helmets).
+// Exactly one of motorcycleTypeId or accessoryId must be set.
 
 export const exportOrderItems = pgTable("export_order_items", {
   id: serial("id").primaryKey(),
   exportOrderId: integer("export_order_id")
     .notNull()
     .references(() => exportOrders.id),
-  motorcycleTypeId: integer("motorcycle_type_id")
-    .notNull()
-    .references(() => motorcycleTypes.id),
+  // One of these two must be set (motorcycle line or accessory line)
+  motorcycleTypeId: integer("motorcycle_type_id").references(
+    () => motorcycleTypes.id,
+  ),
+  accessoryId: integer("accessory_id").references(() => accessories.id),
   quantityRequested: integer("quantity_requested").notNull(),
   quantityAssigned: integer("quantity_assigned").notNull().default(0),
   unitPrice: numeric("unit_price", { precision: 12, scale: 2 }),
+  notes: text("notes"), // e.g., color preference or special instructions
 });
 
 // ─── Export Order Motorcycles (actual units assigned to an order) ─────────────
@@ -324,17 +333,27 @@ export const shipments = pgTable("shipments", {
 });
 
 // ─── Invoices ─────────────────────────────────────────────────────────────────
+// Format: NN/CBR-IMS/MM/YYYY (e.g., 09/CBR-IMS/IV/2025)
 
 export const invoices = pgTable("invoices", {
   id: serial("id").primaryKey(),
-  invoiceNumber: varchar("invoice_number", { length: 50 }).notNull().unique(),
+  invoiceNumber: varchar("invoice_number", { length: 50 }).notNull().unique(), // 09/CBR-IMS/IV/2025
   exportOrderId: integer("export_order_id")
     .notNull()
     .references(() => exportOrders.id),
   clientId: integer("client_id")
     .notNull()
     .references(() => companies.id),
+  // Shipment info
+  vessel: varchar("vessel", { length: 200 }),            // ship/vessel name
+  etd: timestamp("etd"),                                 // Estimated Time of Departure
+  fromPort: varchar("from_port", { length: 200 }),       // origin port
+  toPort: varchar("to_port", { length: 200 }),           // destination port
+  shippingTerm: varchar("shipping_term", { length: 50 }), // e.g., CNF BEIRUT
+  countryOfOrigin: varchar("country_of_origin", { length: 100 }).default("Indonesia"),
+  // Financials (USD)
   subtotal: numeric("subtotal", { precision: 14, scale: 2 }).notNull(),
+  freightAmount: numeric("freight_amount", { precision: 14, scale: 2 }).default("0"),
   taxAmount: numeric("tax_amount", { precision: 14, scale: 2 })
     .notNull()
     .default("0"),
@@ -345,6 +364,64 @@ export const invoices = pgTable("invoices", {
   createdById: integer("created_by_id").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// ─── Invoice Items (line items per invoice) ───────────────────────────────────
+// Each row = one description line (motorcycle model or accessory).
+// description mirrors what appears on the printed invoice (e.g., "YAMAHA NMAX NEO (KEY)").
+
+export const invoiceItems = pgTable("invoice_items", {
+  id: serial("id").primaryKey(),
+  invoiceId: integer("invoice_id")
+    .notNull()
+    .references(() => invoices.id),
+  description: varchar("description", { length: 300 }).notNull(), // printed description of goods
+  // Optional FK links for traceability (not required for printing)
+  motorcycleTypeId: integer("motorcycle_type_id").references(
+    () => motorcycleTypes.id,
+  ),
+  accessoryId: integer("accessory_id").references(() => accessories.id),
+  quantity: integer("quantity").notNull(),
+  unitPrice: numeric("unit_price", { precision: 12, scale: 2 }).notNull(), // USD
+  amount: numeric("amount", { precision: 14, scale: 2 }).notNull(),        // qty × unit_price
+  sortOrder: integer("sort_order").notNull().default(0), // display order on document
+});
+
+// ─── Packing Lists (linked 1:1 to an invoice) ────────────────────────────────
+// Shares the same invoice number. Contains weight details for customs & logistics.
+
+export const packingLists = pgTable("packing_lists", {
+  id: serial("id").primaryKey(),
+  invoiceId: integer("invoice_id")
+    .notNull()
+    .unique() // 1:1 with invoice
+    .references(() => invoices.id),
+  shippingTerm: varchar("shipping_term", { length: 50 }), // mirrors invoice (e.g., CNF BEIRUT)
+  // Totals (computed / stored for quick access)
+  totalQuantity: integer("total_quantity").notNull().default(0),
+  totalGrossWeight: numeric("total_gross_weight", { precision: 10, scale: 2 }), // kg
+  totalNetWeight: numeric("total_net_weight", { precision: 10, scale: 2 }),     // kg
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// ─── Packing List Items (line items per packing list) ────────────────────────
+
+export const packingListItems = pgTable("packing_list_items", {
+  id: serial("id").primaryKey(),
+  packingListId: integer("packing_list_id")
+    .notNull()
+    .references(() => packingLists.id),
+  description: varchar("description", { length: 300 }).notNull(), // same item list as invoice
+  // Optional FK links for traceability
+  motorcycleTypeId: integer("motorcycle_type_id").references(
+    () => motorcycleTypes.id,
+  ),
+  accessoryId: integer("accessory_id").references(() => accessories.id),
+  quantity: integer("quantity").notNull(),
+  grossWeight: numeric("gross_weight", { precision: 10, scale: 2 }).notNull(), // total kg for this line
+  netWeight: numeric("net_weight", { precision: 10, scale: 2 }).notNull(),     // total kg for this line
+  sortOrder: integer("sort_order").notNull().default(0),
 });
 
 // ─── Payments ─────────────────────────────────────────────────────────────────
@@ -436,6 +513,8 @@ export const motorcycleTypesRelations = relations(
   ({ many }) => ({
     motorcycles: many(motorcycles),
     exportOrderItems: many(exportOrderItems),
+    invoiceItems: many(invoiceItems),
+    packingListItems: many(packingListItems),
   }),
 );
 
@@ -494,11 +573,14 @@ export const motorcyclesRelations = relations(motorcycles, ({ one, many }) => ({
   transferMotorcycles: many(warehouseTransferMotorcycles),
 }));
 
-export const accessoriesRelations = relations(accessories, ({ one }) => ({
+export const accessoriesRelations = relations(accessories, ({ one, many }) => ({
   branch: one(branches, {
     fields: [accessories.branchId],
     references: [branches.id],
   }),
+  exportOrderItems: many(exportOrderItems),
+  invoiceItems: many(invoiceItems),
+  packingListItems: many(packingListItems),
 }));
 
 export const exportOrdersRelations = relations(
@@ -533,6 +615,10 @@ export const exportOrderItemsRelations = relations(
     motorcycleType: one(motorcycleTypes, {
       fields: [exportOrderItems.motorcycleTypeId],
       references: [motorcycleTypes.id],
+    }),
+    accessory: one(accessories, {
+      fields: [exportOrderItems.accessoryId],
+      references: [accessories.id],
     }),
   }),
 );
@@ -596,8 +682,54 @@ export const invoicesRelations = relations(invoices, ({ one, many }) => ({
     fields: [invoices.createdById],
     references: [users.id],
   }),
+  items: many(invoiceItems),
+  packingList: one(packingLists),
   payments: many(payments),
 }));
+
+export const invoiceItemsRelations = relations(invoiceItems, ({ one }) => ({
+  invoice: one(invoices, {
+    fields: [invoiceItems.invoiceId],
+    references: [invoices.id],
+  }),
+  motorcycleType: one(motorcycleTypes, {
+    fields: [invoiceItems.motorcycleTypeId],
+    references: [motorcycleTypes.id],
+  }),
+  accessory: one(accessories, {
+    fields: [invoiceItems.accessoryId],
+    references: [accessories.id],
+  }),
+}));
+
+export const packingListsRelations = relations(
+  packingLists,
+  ({ one, many }) => ({
+    invoice: one(invoices, {
+      fields: [packingLists.invoiceId],
+      references: [invoices.id],
+    }),
+    items: many(packingListItems),
+  }),
+);
+
+export const packingListItemsRelations = relations(
+  packingListItems,
+  ({ one }) => ({
+    packingList: one(packingLists, {
+      fields: [packingListItems.packingListId],
+      references: [packingLists.id],
+    }),
+    motorcycleType: one(motorcycleTypes, {
+      fields: [packingListItems.motorcycleTypeId],
+      references: [motorcycleTypes.id],
+    }),
+    accessory: one(accessories, {
+      fields: [packingListItems.accessoryId],
+      references: [accessories.id],
+    }),
+  }),
+);
 
 export const paymentsRelations = relations(payments, ({ one }) => ({
   invoice: one(invoices, {

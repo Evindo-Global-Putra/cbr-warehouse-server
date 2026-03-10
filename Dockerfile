@@ -1,36 +1,26 @@
-FROM oven/bun:1 AS base
+# ─── Stage 1: Install production dependencies ─────────────────────────────────
+FROM oven/bun:1.2-alpine AS deps
 WORKDIR /app
 
-# Install dependencies
-FROM base AS install
-RUN mkdir -p /temp/dev
-COPY package.json bun.lockb /temp/dev/
-RUN cd /temp/dev && bun install --frozen-lockfile
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile --production
 
-# Install production dependencies
-RUN mkdir -p /temp/prod
-COPY package.json bun.lockb /temp/prod/
-RUN cd /temp/prod && bun install --frozen-lockfile --production
+# ─── Stage 2: Production image ────────────────────────────────────────────────
+FROM oven/bun:1.2-alpine AS release
 
-# Copy node_modules from temp directory
-FROM base AS prerelease
-COPY --from=install /temp/dev/node_modules node_modules
-COPY . .
+ENV NODE_ENV=production
 
-# Run tests (optional)
-# ENV NODE_ENV=production
-# RUN bun test
+WORKDIR /app
 
-# Production image
-FROM base AS release
-COPY --from=install /temp/prod/node_modules node_modules
-COPY --from=prerelease /app/src ./src
-COPY --from=prerelease /app/package.json .
-COPY --from=prerelease /app/drizzle ./drizzle
+# Copy only what is needed at runtime
+COPY --from=deps /app/node_modules ./node_modules
+COPY src ./src
+COPY drizzle ./drizzle
+COPY package.json tsconfig.json drizzle.config.ts ./
 
-# Expose port
 EXPOSE 3000
 
-# Run the app
+# Run as the unprivileged bun user (built into the base image)
 USER bun
-ENTRYPOINT [ "bun", "run", "src/index.ts" ]
+
+ENTRYPOINT ["bun", "run", "src/index.ts"]

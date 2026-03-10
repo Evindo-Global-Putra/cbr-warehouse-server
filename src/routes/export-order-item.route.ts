@@ -18,7 +18,11 @@ export const exportOrderItemRoutes = new Elysia({ prefix: "/export-order-items" 
       set.status = 404;
       return { success: false, message };
     }
-    if (message.toLowerCase().includes("cannot add items")) {
+    if (
+      message.toLowerCase().includes("cannot add items") ||
+      message.toLowerCase().includes("must reference") ||
+      message.toLowerCase().includes("cannot reference both")
+    ) {
       set.status = 422;
       return { success: false, message };
     }
@@ -60,10 +64,12 @@ export const exportOrderItemRoutes = new Elysia({ prefix: "/export-order-items" 
     {
       body: t.Object({
         exportOrderId: t.Number(),
-        motorcycleTypeId: t.Number(),
+        motorcycleTypeId: t.Optional(t.Number()),
+        accessoryId: t.Optional(t.Number()),
         quantityRequested: t.Number({ minimum: 1 }),
         quantityAssigned: t.Optional(t.Number({ minimum: 0 })),
         unitPrice: t.Optional(t.String()),
+        notes: t.Optional(t.String()),
       }),
     }
   )
@@ -80,6 +86,7 @@ export const exportOrderItemRoutes = new Elysia({ prefix: "/export-order-items" 
         quantityRequested: t.Optional(t.Number({ minimum: 1 })),
         quantityAssigned: t.Optional(t.Number({ minimum: 0 })),
         unitPrice: t.Optional(t.String()),
+        notes: t.Optional(t.String()),
       }),
     }
   )

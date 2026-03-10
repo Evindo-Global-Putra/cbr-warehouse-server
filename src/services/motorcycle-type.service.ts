@@ -23,23 +23,29 @@ export class MotorcycleTypeService {
   }
 
   async create(data: NewMotorcycleType): Promise<MotorcycleType> {
-    const existing = await this.repo.findByBrandAndModel(data.brand, data.model);
+    const existing = await this.repo.findByBrandModelAndVariant(
+      data.brand,
+      data.model,
+      data.variant
+    );
     if (existing) {
-      throw new Error(`Motorcycle type "${data.brand} ${data.model}" already exists`);
+      const label = [data.brand, data.model, data.variant].filter(Boolean).join(" ");
+      throw new Error(`Motorcycle type "${label}" already exists`);
     }
     return this.repo.create(data);
   }
 
   async update(id: number, data: UpdateMotorcycleType): Promise<MotorcycleType> {
-    await this.getById(id);
+    const current = await this.getById(id);
 
-    if (data.brand || data.model) {
-      const current = await this.getById(id);
+    if (data.brand || data.model || "variant" in data) {
       const brand = data.brand ?? current.brand;
       const model = data.model ?? current.model;
-      const existing = await this.repo.findByBrandAndModel(brand, model);
+      const variant = "variant" in data ? data.variant : current.variant;
+      const existing = await this.repo.findByBrandModelAndVariant(brand, model, variant);
       if (existing && existing.id !== id) {
-        throw new Error(`Motorcycle type "${brand} ${model}" already exists`);
+        const label = [brand, model, variant].filter(Boolean).join(" ");
+        throw new Error(`Motorcycle type "${label}" already exists`);
       }
     }
 

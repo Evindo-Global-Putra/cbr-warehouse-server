@@ -87,10 +87,11 @@ export const invoiceRoutes = new Elysia({ prefix: "/invoices" })
   .post(
     "/",
     async ({ body, set }) => {
-      const { dueDate, ...rest } = body;
+      const { dueDate, etd, ...rest } = body;
       const data = await invoiceService.create({
         ...rest,
         dueDate: dueDate ? new Date(dueDate) : undefined,
+        etd: etd ? new Date(etd) : undefined,
       });
       set.status = 201;
       return { success: true, data };
@@ -100,12 +101,20 @@ export const invoiceRoutes = new Elysia({ prefix: "/invoices" })
         invoiceNumber: t.String(),
         exportOrderId: t.Number(),
         clientId: t.Number(),
+        // Shipment details
+        vessel: t.Optional(t.String()),
+        etd: t.Optional(t.String()),         // ISO date string
+        fromPort: t.Optional(t.String()),
+        toPort: t.Optional(t.String()),
+        shippingTerm: t.Optional(t.String()), // e.g., CNF BEIRUT
+        countryOfOrigin: t.Optional(t.String()),
+        // Financials (USD as string to preserve decimal precision)
         subtotal: t.String(),
+        freightAmount: t.Optional(t.String()),
         taxAmount: t.Optional(t.String()),
         totalAmount: t.String(),
         dueDate: t.Optional(t.String()),
         createdById: t.Optional(t.Number()),
-        notes: t.Optional(t.String()),
       }),
     }
   )
@@ -154,10 +163,11 @@ export const invoiceRoutes = new Elysia({ prefix: "/invoices" })
   .put(
     "/:id",
     async ({ params, body }) => {
-      const { dueDate, ...rest } = body;
+      const { dueDate, etd, ...rest } = body;
       const data = await invoiceService.update(params.id, {
         ...rest,
         dueDate: dueDate ? new Date(dueDate) : undefined,
+        etd: etd ? new Date(etd) : undefined,
       });
       return { success: true, data };
     },
@@ -165,11 +175,17 @@ export const invoiceRoutes = new Elysia({ prefix: "/invoices" })
       params: t.Object({ id: t.Numeric() }),
       body: t.Object({
         invoiceNumber: t.Optional(t.String()),
+        vessel: t.Optional(t.String()),
+        etd: t.Optional(t.String()),
+        fromPort: t.Optional(t.String()),
+        toPort: t.Optional(t.String()),
+        shippingTerm: t.Optional(t.String()),
+        countryOfOrigin: t.Optional(t.String()),
         subtotal: t.Optional(t.String()),
+        freightAmount: t.Optional(t.String()),
         taxAmount: t.Optional(t.String()),
         totalAmount: t.Optional(t.String()),
         dueDate: t.Optional(t.String()),
-        notes: t.Optional(t.String()),
       }),
     }
   )

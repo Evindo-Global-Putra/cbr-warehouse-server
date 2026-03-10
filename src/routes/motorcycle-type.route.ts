@@ -85,6 +85,7 @@ export const motorcycleTypeRoutes = new Elysia({ prefix: "/motorcycle-types" })
       body: t.Object({
         brand: t.String({ minLength: 1 }),
         model: t.String({ minLength: 1 }),
+        variant: t.Optional(t.String({ minLength: 1 })),
         engineCc: t.Optional(t.Number()),
       }),
     }
@@ -101,6 +102,7 @@ export const motorcycleTypeRoutes = new Elysia({ prefix: "/motorcycle-types" })
       body: t.Object({
         brand: t.Optional(t.String({ minLength: 1 })),
         model: t.Optional(t.String({ minLength: 1 })),
+        variant: t.Optional(t.Nullable(t.String({ minLength: 1 }))),
         engineCc: t.Optional(t.Number()),
       }),
     }

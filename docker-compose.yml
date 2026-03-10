@@ -1,50 +1,53 @@
 # docker-compose.yml
-version: "3.8"
 
 services:
-  # PostgreSQL Development
+  # ─── PostgreSQL ─────────────────────────────────────────────────────────────
   postgres-dev:
     image: postgres:16-alpine
     container_name: cbr-postgres-dev
     restart: unless-stopped
-    env_file:
-      - .env.docker
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secret}
-      POSTGRES_DB: ${POSTGRES_DB:-cbr-server-dev}
+    env_file: .env.docker
     ports:
-      - "5432:5432"
+      # Bind to 127.0.0.1 only — not exposed on the network
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres-dev-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
     networks:
       - cbr-network
+    security_opt:
+      - no-new-privileges:true
 
-  # ElysiaJS App Development
- app-dev:
+  # ─── ElysiaJS App ───────────────────────────────────────────────────────────
+  app-dev:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: cbr-app-dev
     restart: unless-stopped
+    env_file: .env.docker
     ports:
-      - "${APP_PORT:-3000}:3000"
-    env_file:
-      - .env.local
+      # Bind to 127.0.0.1 only — not exposed on the network
+      - "127.0.0.1:${APP_PORT:-3000}:3000"
     depends_on:
       postgres-dev:
         condition: service_healthy
     networks:
       - cbr-network
     volumes:
-      - ./src:/app/src
-      - ./drizzle:/app/drizzle
+      # Mount source for hot-reload; read-only prevents container writes
+      - ./src:/app/src:ro
+      - ./drizzle:/app/drizzle:ro
     command: bun run --watch src/index.ts
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
 
 networks:
   cbr-network:

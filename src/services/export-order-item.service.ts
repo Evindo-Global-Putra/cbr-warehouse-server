@@ -36,6 +36,14 @@ export class ExportOrderItemService {
         `Cannot add items to an export order with status '${order.status}'`
       );
     }
+    const hasMoto = data.motorcycleTypeId != null;
+    const hasAcc = data.accessoryId != null;
+    if (!hasMoto && !hasAcc) {
+      throw new Error("Export order item must reference a motorcycleTypeId or an accessoryId");
+    }
+    if (hasMoto && hasAcc) {
+      throw new Error("Export order item cannot reference both motorcycleTypeId and accessoryId");
+    }
     return this.repo.create(data);
   }
 

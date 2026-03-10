@@ -1,4 +1,4 @@
-import { and, eq, ilike } from "drizzle-orm";
+import { and, eq, ilike, sql } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import * as schema from "../db/schema";
 import { motorcycleTypes } from "../db/schema";
@@ -32,14 +32,23 @@ export class MotorcycleTypeRepository {
       .where(ilike(motorcycleTypes.brand, brand));
   }
 
-  async findByBrandAndModel(
+  async findByBrandModelAndVariant(
     brand: string,
-    model: string
+    model: string,
+    variant?: string | null
   ): Promise<MotorcycleType | undefined> {
     const result = await this.db
       .select()
       .from(motorcycleTypes)
-      .where(and(eq(motorcycleTypes.brand, brand), eq(motorcycleTypes.model, model)));
+      .where(
+        and(
+          eq(motorcycleTypes.brand, brand),
+          eq(motorcycleTypes.model, model),
+          variant != null
+            ? eq(motorcycleTypes.variant, variant)
+            : sql`${motorcycleTypes.variant} is null`
+        )
+      );
     return result[0];
   }
 
