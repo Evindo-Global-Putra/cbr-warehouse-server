@@ -16,6 +16,9 @@ import { exportOrderMotorcycleRoutes } from "./routes/export-order-motorcycle.ro
 import { loadingFormRoutes } from "./routes/loading-form.route";
 import { shipmentRoutes } from "./routes/shipment.route";
 import { invoiceRoutes } from "./routes/invoice.route";
+import { invoiceItemRoutes } from "./routes/invoice-item.route";
+import { packingListRoutes } from "./routes/packing-list.route";
+import { packingListItemRoutes } from "./routes/packing-list-item.route";
 import { paymentRoutes } from "./routes/payment.route";
 import { warehouseTransferRoutes } from "./routes/warehouse-transfer.route";
 import { warehouseTransferMotorcycleRoutes } from "./routes/warehouse-transfer-motorcycle.route";
@@ -49,6 +52,9 @@ const app = new Elysia()
       .use(loadingFormRoutes)
       .use(shipmentRoutes)
       .use(invoiceRoutes)
+      .use(invoiceItemRoutes)
+      .use(packingListRoutes)
+      .use(packingListItemRoutes)
       .use(paymentRoutes)
       .use(warehouseTransferRoutes)
       .use(warehouseTransferMotorcycleRoutes),
