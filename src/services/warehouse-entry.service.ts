@@ -14,6 +14,15 @@ export class WarehouseEntryService {
     return this.repo.findAll();
   }
 
+  async getPaginated(
+    filters: { status?: WarehouseEntry["status"]; branchId?: number; travelPermitId?: number },
+    page: number,
+    limit: number
+  ): Promise<{ data: WarehouseEntry[]; meta: { page: number; limit: number; total: number; totalPages: number } }> {
+    const { data, total } = await this.repo.findPaginated(filters, page, limit);
+    return { data, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+  }
+
   async getById(id: number): Promise<WarehouseEntry> {
     const entry = await this.repo.findById(id);
     if (!entry) throw new Error(`Warehouse entry with id ${id} not found`);

@@ -105,6 +105,7 @@ export const users = pgTable("users", {
   role: userRoleEnum("role").notNull(),
   branchId: integer("branch_id").references(() => branches.id),
   isActive: boolean("is_active").notNull().default(true),
+  tokenVersion: integer("token_version").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

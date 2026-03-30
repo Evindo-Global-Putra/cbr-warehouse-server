@@ -12,6 +12,15 @@ export class MotorcycleTypeService {
     return this.repo.findAll();
   }
 
+  async getPaginated(
+    filters: { brand?: string; search?: string },
+    page: number,
+    limit: number
+  ): Promise<{ data: MotorcycleType[]; meta: { page: number; limit: number; total: number; totalPages: number } }> {
+    const { data, total } = await this.repo.findPaginated(filters, page, limit);
+    return { data, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+  }
+
   async getById(id: number): Promise<MotorcycleType> {
     const type = await this.repo.findById(id);
     if (!type) throw new Error(`Motorcycle type with id ${id} not found`);

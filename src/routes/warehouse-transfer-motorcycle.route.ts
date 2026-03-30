@@ -4,20 +4,31 @@ import { WarehouseTransferMotorcycleRepository } from "../repositories/warehouse
 import { WarehouseTransferRepository } from "../repositories/warehouse-transfer.repository";
 import { MotorcycleRepository } from "../repositories/motorcycle.repository";
 import { WarehouseTransferMotorcycleService } from "../services/warehouse-transfer-motorcycle.service";
+import { authPlugin, requireRole } from "../plugins/auth.plugin";
 
 const wtmService = new WarehouseTransferMotorcycleService(
   new WarehouseTransferMotorcycleRepository(db),
   new WarehouseTransferRepository(db),
-  new MotorcycleRepository(db)
+  new MotorcycleRepository(db),
 );
 
 export const warehouseTransferMotorcycleRoutes = new Elysia({
   prefix: "/warehouse-transfer-motorcycles",
 })
+  .use(authPlugin)
+  // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {
     const message =
       error instanceof Error ? error.message : "Internal server error";
 
+    if (message === "Unauthorized") {
+      set.status = 401;
+      return { success: false, message };
+    }
+    if (message === "Forbidden") {
+      set.status = 403;
+      return { success: false, message };
+    }
     if (message.toLowerCase().includes("not found")) {
       set.status = 404;
       return { success: false, message };
@@ -43,7 +54,7 @@ export const warehouseTransferMotorcycleRoutes = new Elysia({
       const data = await wtmService.getByTransfer(params.transferId);
       return { success: true, data };
     },
-    { params: t.Object({ transferId: t.Numeric() }) }
+    { params: t.Object({ transferId: t.Numeric() }) },
   )
   // ─── GET /warehouse-transfer-motorcycles/motorcycle/:motorcycleId ─────────
   .get(
@@ -52,7 +63,7 @@ export const warehouseTransferMotorcycleRoutes = new Elysia({
       const data = await wtmService.getByMotorcycle(params.motorcycleId);
       return { success: true, data };
     },
-    { params: t.Object({ motorcycleId: t.Numeric() }) }
+    { params: t.Object({ motorcycleId: t.Numeric() }) },
   )
   // ─── GET /warehouse-transfer-motorcycles/:id ──────────────────────────────
   .get(
@@ -61,13 +72,14 @@ export const warehouseTransferMotorcycleRoutes = new Elysia({
       const data = await wtmService.getById(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) }
+    { params: t.Object({ id: t.Numeric() }) },
   )
   // ─── POST /warehouse-transfer-motorcycles ─────────────────────────────────
   // Add a motorcycle to a pending transfer
   .post(
     "/",
-    async ({ body, set }) => {
+    async ({ body, set, currentUser }) => {
+      requireRole(["super_admin", "admin_warehouse"], currentUser.role);
       const data = await wtmService.addMotorcycle(body);
       set.status = 201;
       return { success: true, data };
@@ -77,16 +89,17 @@ export const warehouseTransferMotorcycleRoutes = new Elysia({
         transferId: t.Number(),
         motorcycleId: t.Number(),
       }),
-    }
+    },
   )
   // ─── DELETE /warehouse-transfer-motorcycles/transfer/:transferId/motorcycle/:motorcycleId
   // Remove a specific motorcycle from a pending transfer
   .delete(
     "/transfer/:transferId/motorcycle/:motorcycleId",
-    async ({ params }) => {
+    async ({ params, currentUser }) => {
+      requireRole(["super_admin", "admin_warehouse"], currentUser.role);
       const data = await wtmService.removeMotorcycle(
         params.transferId,
-        params.motorcycleId
+        params.motorcycleId,
       );
       return { success: true, data };
     },
@@ -95,14 +108,15 @@ export const warehouseTransferMotorcycleRoutes = new Elysia({
         transferId: t.Numeric(),
         motorcycleId: t.Numeric(),
       }),
-    }
+    },
   )
   // ─── DELETE /warehouse-transfer-motorcycles/:id ───────────────────────────
   .delete(
     "/:id",
-    async ({ params }) => {
+    async ({ params, currentUser }) => {
+      requireRole(["super_admin", "admin_warehouse"], currentUser.role);
       const data = await wtmService.delete(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) }
+    { params: t.Object({ id: t.Numeric() }) },
   );

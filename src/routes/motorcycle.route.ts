@@ -1,9 +1,9 @@
 import { Elysia, t } from "elysia";
-// import { jwt } from "@elysiajs/jwt";
 import { db } from "../db";
 import { MotorcycleRepository } from "../repositories/motorcycle.repository";
 import { WarehouseEntryRepository } from "../repositories/warehouse-entry.repository";
 import { MotorcycleService } from "../services/motorcycle.service";
+import { authPlugin, requireRole } from "../plugins/auth.plugin";
 
 const motorcycleService = new MotorcycleService(
   new MotorcycleRepository(db),
@@ -11,22 +11,7 @@ const motorcycleService = new MotorcycleService(
 );
 
 export const motorcycleRoutes = new Elysia({ prefix: "/motorcycles" })
-  // .use(
-  //   jwt({
-  //     name: "jwt",
-  //     secret: process.env.JWT_SECRET!,
-  //   })
-  // )
-  // ─── Auth guard ───────────────────────────────────────────────────────────
-  // .derive(async ({ headers, jwt }) => {
-  //   const auth = headers["authorization"];
-  //   if (!auth?.startsWith("Bearer ")) throw new Error("Unauthorized");
-
-  //   const payload = await jwt.verify(auth.slice(7));
-  //   if (!payload) throw new Error("Unauthorized");
-
-  //   return { currentUser: payload };
-  // })
+  .use(authPlugin)
   // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {
     const message =
@@ -34,6 +19,10 @@ export const motorcycleRoutes = new Elysia({ prefix: "/motorcycles" })
 
     if (message === "Unauthorized") {
       set.status = 401;
+      return { success: false, message };
+    }
+    if (message === "Forbidden") {
+      set.status = 403;
       return { success: false, message };
     }
     if (message.toLowerCase().includes("not found")) {
@@ -54,10 +43,43 @@ export const motorcycleRoutes = new Elysia({ prefix: "/motorcycles" })
     return { success: false, message: "Internal server error" };
   })
   // ─── GET /motorcycles ─────────────────────────────────────────────────────
-  .get("/", async () => {
-    const data = await motorcycleService.getAll();
-    return { success: true, data };
-  })
+  .get(
+    "/",
+    async ({ query }) => {
+      const page = query.page ?? 1;
+      const limit = query.limit ?? 20;
+      const result = await motorcycleService.getPaginated(
+        {
+          status: query.status,
+          branchId: query.branchId,
+          typeId: query.typeId,
+          color: query.color,
+          search: query.search,
+        },
+        page,
+        limit
+      );
+      return { success: true, ...result };
+    },
+    {
+      query: t.Object({
+        page: t.Optional(t.Numeric({ minimum: 1 })),
+        limit: t.Optional(t.Numeric({ minimum: 1, maximum: 100 })),
+        status: t.Optional(
+          t.Union([
+            t.Literal("on_site"),
+            t.Literal("loading"),
+            t.Literal("exported"),
+            t.Literal("transferred"),
+          ])
+        ),
+        branchId: t.Optional(t.Numeric()),
+        typeId: t.Optional(t.Numeric()),
+        color: t.Optional(t.String()),
+        search: t.Optional(t.String()),
+      }),
+    },
+  )
   // ─── GET /motorcycles/status/:status ──────────────────────────────────────
   .get(
     "/status/:status",
@@ -161,7 +183,8 @@ export const motorcycleRoutes = new Elysia({ prefix: "/motorcycles" })
   // and increments the parent warehouse entry scan count.
   .post(
     "/scan",
-    async ({ body, set }) => {
+    async ({ body, set, currentUser }) => {
+      requireRole(["super_admin", "admin_warehouse"], currentUser.role);
       const data = await motorcycleService.scan({
         ...body,
         entryDate: new Date(),
@@ -193,7 +216,8 @@ export const motorcycleRoutes = new Elysia({ prefix: "/motorcycles" })
   // Transition: on_site → loading/transferred, loading → on_site/exported
   .patch(
     "/:id/status",
-    async ({ params, body }) => {
+    async ({ params, body, currentUser }) => {
+      requireRole(["super_admin", "admin_warehouse"], currentUser.role);
       const data = await motorcycleService.updateStatus(params.id, body.status);
       return { success: true, data };
     },
@@ -212,7 +236,8 @@ export const motorcycleRoutes = new Elysia({ prefix: "/motorcycles" })
   // ─── PUT /motorcycles/:id ─────────────────────────────────────────────────
   .put(
     "/:id",
-    async ({ params, body }) => {
+    async ({ params, body, currentUser }) => {
+      requireRole(["super_admin", "admin_warehouse"], currentUser.role);
       const data = await motorcycleService.update(params.id, body);
       return { success: true, data };
     },
@@ -235,7 +260,8 @@ export const motorcycleRoutes = new Elysia({ prefix: "/motorcycles" })
   // Only on_site motorcycles can be deleted.
   .delete(
     "/:id",
-    async ({ params }) => {
+    async ({ params, currentUser }) => {
+      requireRole(["super_admin", "admin_warehouse"], currentUser.role);
       const data = await motorcycleService.delete(params.id);
       return { success: true, data };
     },

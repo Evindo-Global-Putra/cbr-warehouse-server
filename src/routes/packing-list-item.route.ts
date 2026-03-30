@@ -3,17 +3,28 @@ import { db } from "../db";
 import { PackingListItemRepository } from "../repositories/packing-list-item.repository";
 import { PackingListRepository } from "../repositories/packing-list.repository";
 import { PackingListItemService } from "../services/packing-list-item.service";
+import { authPlugin, requireRole } from "../plugins/auth.plugin";
 
 const packingListItemService = new PackingListItemService(
   new PackingListItemRepository(db),
-  new PackingListRepository(db)
+  new PackingListRepository(db),
 );
 
 export const packingListItemRoutes = new Elysia({ prefix: "/packing-list-items" })
+  .use(authPlugin)
+  // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {
     const message =
       error instanceof Error ? error.message : "Internal server error";
 
+    if (message === "Unauthorized") {
+      set.status = 401;
+      return { success: false, message };
+    }
+    if (message === "Forbidden") {
+      set.status = 403;
+      return { success: false, message };
+    }
     if (message.toLowerCase().includes("not found")) {
       set.status = 404;
       return { success: false, message };
@@ -33,11 +44,11 @@ export const packingListItemRoutes = new Elysia({ prefix: "/packing-list-items" 
     "/packing-list/:packingListId",
     async ({ params }) => {
       const data = await packingListItemService.getByPackingList(
-        params.packingListId
+        params.packingListId,
       );
       return { success: true, data };
     },
-    { params: t.Object({ packingListId: t.Numeric() }) }
+    { params: t.Object({ packingListId: t.Numeric() }) },
   )
   // ─── GET /packing-list-items/:id ──────────────────────────────────────────
   .get(
@@ -46,13 +57,14 @@ export const packingListItemRoutes = new Elysia({ prefix: "/packing-list-items" 
       const data = await packingListItemService.getById(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) }
+    { params: t.Object({ id: t.Numeric() }) },
   )
   // ─── POST /packing-list-items ─────────────────────────────────────────────
   // After insert, parent packing list totals are auto-recomputed.
   .post(
     "/",
-    async ({ body, set }) => {
+    async ({ body, set, currentUser }) => {
+      requireRole(["super_admin", "admin_export"], currentUser.role);
       const data = await packingListItemService.create(body);
       set.status = 201;
       return { success: true, data };
@@ -64,17 +76,18 @@ export const packingListItemRoutes = new Elysia({ prefix: "/packing-list-items" 
         motorcycleTypeId: t.Optional(t.Number()),
         accessoryId: t.Optional(t.Number()),
         quantity: t.Number({ minimum: 1 }),
-        grossWeight: t.String(), // total kg for this line, numeric string
-        netWeight: t.String(),   // total kg for this line, numeric string
+        grossWeight: t.String(),
+        netWeight: t.String(),
         sortOrder: t.Optional(t.Number()),
       }),
-    }
+    },
   )
   // ─── PUT /packing-list-items/:id ──────────────────────────────────────────
   // After update, parent packing list totals are auto-recomputed.
   .put(
     "/:id",
-    async ({ params, body }) => {
+    async ({ params, body, currentUser }) => {
+      requireRole(["super_admin", "admin_export"], currentUser.role);
       const data = await packingListItemService.update(params.id, body);
       return { success: true, data };
     },
@@ -89,15 +102,16 @@ export const packingListItemRoutes = new Elysia({ prefix: "/packing-list-items" 
         netWeight: t.Optional(t.String()),
         sortOrder: t.Optional(t.Number()),
       }),
-    }
+    },
   )
   // ─── DELETE /packing-list-items/:id ───────────────────────────────────────
   // After delete, parent packing list totals are auto-recomputed.
   .delete(
     "/:id",
-    async ({ params }) => {
+    async ({ params, currentUser }) => {
+      requireRole(["super_admin", "admin_export"], currentUser.role);
       const data = await packingListItemService.delete(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) }
+    { params: t.Object({ id: t.Numeric() }) },
   );

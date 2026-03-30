@@ -1,28 +1,13 @@
 import { Elysia, t } from "elysia";
-// import { jwt } from "@elysiajs/jwt";
 import { db } from "../db";
 import { BranchRepository } from "../repositories/branch.repository";
 import { BranchService } from "../services/branch.service";
+import { authPlugin, requireRole } from "../plugins/auth.plugin";
 
 const branchService = new BranchService(new BranchRepository(db));
 
 export const branchRoutes = new Elysia({ prefix: "/branches" })
-  // .use(
-  //   jwt({
-  //     name: "jwt",
-  //     secret: process.env.JWT_SECRET!,
-  //   }),
-  // )
-  // ─── Auth guard (applies to all routes below) ─────────────────────────────
-  // .derive(async ({ headers, jwt }) => {
-  //   const auth = headers["authorization"];
-  //   if (!auth?.startsWith("Bearer ")) throw new Error("Unauthorized");
-  //
-  //   const payload = await jwt.verify(auth.slice(7));
-  //   if (!payload) throw new Error("Unauthorized");
-  //
-  //   return { currentUser: payload };
-  // })
+  .use(authPlugin)
   // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {
     const message =
@@ -30,6 +15,10 @@ export const branchRoutes = new Elysia({ prefix: "/branches" })
 
     if (message === "Unauthorized") {
       set.status = 401;
+      return { success: false, message };
+    }
+    if (message === "Forbidden") {
+      set.status = 403;
       return { success: false, message };
     }
     if (message.toLowerCase().includes("not found")) {
@@ -77,7 +66,8 @@ export const branchRoutes = new Elysia({ prefix: "/branches" })
   // ─── POST /branches ───────────────────────────────────────────────────────
   .post(
     "/",
-    async ({ body, set }) => {
+    async ({ body, set, currentUser }) => {
+      requireRole(["super_admin"], currentUser.role);
       const data = await branchService.create(body);
       set.status = 201;
       return { success: true, data };
@@ -94,7 +84,8 @@ export const branchRoutes = new Elysia({ prefix: "/branches" })
   // ─── PUT /branches/:id ────────────────────────────────────────────────────
   .put(
     "/:id",
-    async ({ params, body }) => {
+    async ({ params, body, currentUser }) => {
+      requireRole(["super_admin"], currentUser.role);
       const data = await branchService.update(params.id, body);
       return { success: true, data };
     },
@@ -111,7 +102,8 @@ export const branchRoutes = new Elysia({ prefix: "/branches" })
   // ─── DELETE /branches/:id ─────────────────────────────────────────────────
   .delete(
     "/:id",
-    async ({ params }) => {
+    async ({ params, currentUser }) => {
+      requireRole(["super_admin"], currentUser.role);
       const data = await branchService.delete(params.id);
       return { success: true, data };
     },

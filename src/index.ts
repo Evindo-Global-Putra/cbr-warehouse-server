@@ -32,6 +32,16 @@ const app = new Elysia()
           title: "CBR Warehouse API",
           version: "1.0.0",
         },
+        components: {
+          securitySchemes: {
+            bearerAuth: {
+              type: "http",
+              scheme: "bearer",
+              bearerFormat: "JWT",
+            },
+          },
+        },
+        security: [{ bearerAuth: [] }],
       },
     }),
   )
@@ -59,6 +69,6 @@ const app = new Elysia()
       .use(warehouseTransferRoutes)
       .use(warehouseTransferMotorcycleRoutes),
   )
-  .listen(process.env.PORT ?? 3000);
+  .listen(process.env.PORT ?? 8000);
 
 console.log(`Elysia is running at ${app.server?.hostname}:${app.server?.port}`);

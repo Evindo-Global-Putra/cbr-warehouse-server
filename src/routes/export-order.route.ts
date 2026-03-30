@@ -2,6 +2,7 @@ import { Elysia, t } from "elysia";
 import { db } from "../db";
 import { ExportOrderRepository } from "../repositories/export-order.repository";
 import { ExportOrderService } from "../services/export-order.service";
+import { authPlugin, requireRole } from "../plugins/auth.plugin";
 
 const exportOrderService = new ExportOrderService(new ExportOrderRepository(db));
 
@@ -16,10 +17,20 @@ const exportOrderStatusValues = [
 ] as const;
 
 export const exportOrderRoutes = new Elysia({ prefix: "/export-orders" })
+  .use(authPlugin)
+  // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {
     const message =
       error instanceof Error ? error.message : "Internal server error";
 
+    if (message === "Unauthorized") {
+      set.status = 401;
+      return { success: false, message };
+    }
+    if (message === "Forbidden") {
+      set.status = 403;
+      return { success: false, message };
+    }
     if (message.toLowerCase().includes("not found")) {
       set.status = 404;
       return { success: false, message };
@@ -52,7 +63,7 @@ export const exportOrderRoutes = new Elysia({ prefix: "/export-orders" })
       params: t.Object({
         status: t.Union(exportOrderStatusValues.map((s) => t.Literal(s))),
       }),
-    }
+    },
   )
   // ─── GET /export-orders/client/:clientId ──────────────────────────────────
   .get(
@@ -61,7 +72,7 @@ export const exportOrderRoutes = new Elysia({ prefix: "/export-orders" })
       const data = await exportOrderService.getByClient(params.clientId);
       return { success: true, data };
     },
-    { params: t.Object({ clientId: t.Numeric() }) }
+    { params: t.Object({ clientId: t.Numeric() }) },
   )
   // ─── GET /export-orders/branch/:branchId ─────────────────────────────────
   .get(
@@ -70,7 +81,7 @@ export const exportOrderRoutes = new Elysia({ prefix: "/export-orders" })
       const data = await exportOrderService.getByBranch(params.branchId);
       return { success: true, data };
     },
-    { params: t.Object({ branchId: t.Numeric() }) }
+    { params: t.Object({ branchId: t.Numeric() }) },
   )
   // ─── GET /export-orders/:id ───────────────────────────────────────────────
   .get(
@@ -79,12 +90,13 @@ export const exportOrderRoutes = new Elysia({ prefix: "/export-orders" })
       const data = await exportOrderService.getById(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) }
+    { params: t.Object({ id: t.Numeric() }) },
   )
   // ─── POST /export-orders ──────────────────────────────────────────────────
   .post(
     "/",
-    async ({ body, set }) => {
+    async ({ body, set, currentUser }) => {
+      requireRole(["super_admin", "admin_export"], currentUser.role);
       const data = await exportOrderService.create(body);
       set.status = 201;
       return { success: true, data };
@@ -98,12 +110,13 @@ export const exportOrderRoutes = new Elysia({ prefix: "/export-orders" })
         notes: t.Optional(t.String()),
         createdById: t.Optional(t.Number()),
       }),
-    }
+    },
   )
   // ─── PATCH /export-orders/:id/status ─────────────────────────────────────
   .patch(
     "/:id/status",
-    async ({ params, body }) => {
+    async ({ params, body, currentUser }) => {
+      requireRole(["super_admin", "admin_export"], currentUser.role);
       const data = await exportOrderService.updateStatus(params.id, body.status);
       return { success: true, data };
     },
@@ -112,12 +125,13 @@ export const exportOrderRoutes = new Elysia({ prefix: "/export-orders" })
       body: t.Object({
         status: t.Union(exportOrderStatusValues.map((s) => t.Literal(s))),
       }),
-    }
+    },
   )
   // ─── PUT /export-orders/:id ───────────────────────────────────────────────
   .put(
     "/:id",
-    async ({ params, body }) => {
+    async ({ params, body, currentUser }) => {
+      requireRole(["super_admin", "admin_export"], currentUser.role);
       const data = await exportOrderService.update(params.id, body);
       return { success: true, data };
     },
@@ -131,14 +145,15 @@ export const exportOrderRoutes = new Elysia({ prefix: "/export-orders" })
         notes: t.Optional(t.String()),
         createdById: t.Optional(t.Number()),
       }),
-    }
+    },
   )
   // ─── DELETE /export-orders/:id ────────────────────────────────────────────
   .delete(
     "/:id",
-    async ({ params }) => {
+    async ({ params, currentUser }) => {
+      requireRole(["super_admin", "admin_export"], currentUser.role);
       const data = await exportOrderService.delete(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) }
+    { params: t.Object({ id: t.Numeric() }) },
   );

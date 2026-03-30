@@ -1,4 +1,5 @@
-import { eq, sql } from "drizzle-orm";
+import { and, count, eq, ilike, or, sql } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import * as schema from "../db/schema";
 import { accessories } from "../db/schema";
@@ -13,6 +14,33 @@ export class AccessoryRepository {
 
   async findAll(): Promise<Accessory[]> {
     return this.db.select().from(accessories);
+  }
+
+  async findPaginated(
+    filters: { branchId?: number; category?: string; search?: string },
+    page: number,
+    limit: number
+  ): Promise<{ data: Accessory[]; total: number }> {
+    const conditions: SQL[] = [];
+    if (filters.branchId) conditions.push(eq(accessories.branchId, filters.branchId));
+    if (filters.category) conditions.push(ilike(accessories.category, filters.category));
+    if (filters.search) {
+      const pattern = `%${filters.search}%`;
+      conditions.push(
+        or(
+          ilike(accessories.name, pattern),
+          ilike(accessories.sku, pattern)
+        )!
+      );
+    }
+    const where = conditions.length > 0 ? and(...conditions) : undefined;
+    const offset = (page - 1) * limit;
+
+    const [data, [{ value: total }]] = await Promise.all([
+      this.db.select().from(accessories).where(where).limit(limit).offset(offset),
+      this.db.select({ value: count() }).from(accessories).where(where),
+    ]);
+    return { data, total: Number(total) };
   }
 
   async findById(id: number): Promise<Accessory | undefined> {

@@ -12,6 +12,15 @@ export class AccessoryService {
     return this.repo.findAll();
   }
 
+  async getPaginated(
+    filters: { branchId?: number; category?: string; search?: string },
+    page: number,
+    limit: number
+  ): Promise<{ data: Accessory[]; meta: { page: number; limit: number; total: number; totalPages: number } }> {
+    const { data, total } = await this.repo.findPaginated(filters, page, limit);
+    return { data, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+  }
+
   async getById(id: number): Promise<Accessory> {
     const item = await this.repo.findById(id);
     if (!item) throw new Error(`Accessory with id ${id} not found`);

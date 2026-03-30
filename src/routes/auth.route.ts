@@ -17,6 +17,10 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
     const message =
       error instanceof Error ? error.message : "Internal server error";
 
+    if (message === "Unauthorized") {
+      set.status = 401;
+      return { success: false, message };
+    }
     if (message.toLowerCase().includes("already exists")) {
       set.status = 409;
       return { success: false, message };
@@ -85,6 +89,7 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
         sub: String(user.id),
         role: user.role,
         branchId: user.branchId ?? undefined,
+        tokenVersion: user.tokenVersion,
       });
 
       const { passwordHash, ...safeUser } = user;
@@ -97,28 +102,53 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
       }),
     },
   )
+  // ─── Logout ───────────────────────────────────────────────────────────────
+  // Invalidates the current token by incrementing the user's tokenVersion.
+  // Any previously issued tokens will be rejected by the authPlugin.
+  .post(
+    "/logout",
+    async ({ headers, jwt, set }) => {
+      const auth = headers["authorization"];
+      if (!auth?.startsWith("Bearer ")) {
+        set.status = 401;
+        return { success: false, message: "Unauthorized" };
+      }
+
+      const payload = await jwt.verify(auth.slice(7));
+      if (!payload) {
+        set.status = 401;
+        return { success: false, message: "Invalid or expired token" };
+      }
+
+      await userService.logout(Number(payload.sub));
+      return { success: true, message: "Logged out successfully" };
+    },
+  )
   // ─── Me (get current authenticated user) ─────────────────────────────────
-  .get("/me", async ({ headers, jwt, set }) => {
-    const auth = headers["authorization"];
-    if (!auth?.startsWith("Bearer ")) {
-      set.status = 401;
-      return { success: false, message: "Unauthorized" };
-    }
+  .get(
+    "/me",
+    async ({ headers, jwt, set }) => {
+      const auth = headers["authorization"];
+      if (!auth?.startsWith("Bearer ")) {
+        set.status = 401;
+        return { success: false, message: "Unauthorized" };
+      }
 
-    const payload = await jwt.verify(auth.slice(7));
-    if (!payload) {
-      set.status = 401;
-      return { success: false, message: "Invalid or expired token" };
-    }
+      const payload = await jwt.verify(auth.slice(7));
+      if (!payload) {
+        set.status = 401;
+        return { success: false, message: "Invalid or expired token" };
+      }
 
-    const user = await userService
-      .getById(Number(payload.sub))
-      .catch(() => null);
-    if (!user || !user.isActive) {
-      set.status = 401;
-      return { success: false, message: "Unauthorized" };
-    }
+      const user = await userService
+        .getById(Number(payload.sub))
+        .catch(() => null);
+      if (!user || !user.isActive) {
+        set.status = 401;
+        return { success: false, message: "Unauthorized" };
+      }
 
-    const { passwordHash, ...safeUser } = user;
-    return { success: true, data: safeUser };
-  });
+      const { passwordHash, ...safeUser } = user;
+      return { success: true, data: safeUser };
+    },
+  );

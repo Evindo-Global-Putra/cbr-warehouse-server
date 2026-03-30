@@ -1,4 +1,5 @@
-import { eq, sql } from "drizzle-orm";
+import { and, count, eq, sql } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import * as schema from "../db/schema";
 import { warehouseEntries } from "../db/schema";
@@ -15,6 +16,29 @@ export class WarehouseEntryRepository {
 
   async findAll(): Promise<WarehouseEntry[]> {
     return this.db.select().from(warehouseEntries);
+  }
+
+  async findPaginated(
+    filters: {
+      status?: WarehouseEntry["status"];
+      branchId?: number;
+      travelPermitId?: number;
+    },
+    page: number,
+    limit: number
+  ): Promise<{ data: WarehouseEntry[]; total: number }> {
+    const conditions: SQL[] = [];
+    if (filters.status) conditions.push(eq(warehouseEntries.status, filters.status));
+    if (filters.branchId) conditions.push(eq(warehouseEntries.branchId, filters.branchId));
+    if (filters.travelPermitId) conditions.push(eq(warehouseEntries.travelPermitId, filters.travelPermitId));
+    const where = conditions.length > 0 ? and(...conditions) : undefined;
+    const offset = (page - 1) * limit;
+
+    const [data, [{ value: total }]] = await Promise.all([
+      this.db.select().from(warehouseEntries).where(where).limit(limit).offset(offset),
+      this.db.select({ value: count() }).from(warehouseEntries).where(where),
+    ]);
+    return { data, total: Number(total) };
   }
 
   async findById(id: number): Promise<WarehouseEntry | undefined> {

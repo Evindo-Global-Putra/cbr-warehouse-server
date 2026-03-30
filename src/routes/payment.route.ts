@@ -3,10 +3,11 @@ import { db } from "../db";
 import { PaymentRepository } from "../repositories/payment.repository";
 import { InvoiceRepository } from "../repositories/invoice.repository";
 import { PaymentService } from "../services/payment.service";
+import { authPlugin, requireRole } from "../plugins/auth.plugin";
 
 const paymentService = new PaymentService(
   new PaymentRepository(db),
-  new InvoiceRepository(db)
+  new InvoiceRepository(db),
 );
 
 const paymentMethodValues = [
@@ -17,10 +18,20 @@ const paymentMethodValues = [
 ] as const;
 
 export const paymentRoutes = new Elysia({ prefix: "/payments" })
+  .use(authPlugin)
+  // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {
     const message =
       error instanceof Error ? error.message : "Internal server error";
 
+    if (message === "Unauthorized") {
+      set.status = 401;
+      return { success: false, message };
+    }
+    if (message === "Forbidden") {
+      set.status = 403;
+      return { success: false, message };
+    }
     if (message.toLowerCase().includes("not found")) {
       set.status = 404;
       return { success: false, message };
@@ -48,7 +59,7 @@ export const paymentRoutes = new Elysia({ prefix: "/payments" })
       const data = await paymentService.getByInvoice(params.invoiceId);
       return { success: true, data };
     },
-    { params: t.Object({ invoiceId: t.Numeric() }) }
+    { params: t.Object({ invoiceId: t.Numeric() }) },
   )
   // ─── GET /payments/method/:method ─────────────────────────────────────────
   .get(
@@ -61,7 +72,7 @@ export const paymentRoutes = new Elysia({ prefix: "/payments" })
       params: t.Object({
         method: t.Union(paymentMethodValues.map((m) => t.Literal(m))),
       }),
-    }
+    },
   )
   // ─── GET /payments/:id ────────────────────────────────────────────────────
   .get(
@@ -70,12 +81,13 @@ export const paymentRoutes = new Elysia({ prefix: "/payments" })
       const data = await paymentService.getById(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) }
+    { params: t.Object({ id: t.Numeric() }) },
   )
   // ─── POST /payments ───────────────────────────────────────────────────────
   .post(
     "/",
-    async ({ body, set }) => {
+    async ({ body, set, currentUser }) => {
+      requireRole(["super_admin", "finance"], currentUser.role);
       const { paymentDate, ...rest } = body;
       const data = await paymentService.create({
         ...rest,
@@ -94,15 +106,16 @@ export const paymentRoutes = new Elysia({ prefix: "/payments" })
         notes: t.Optional(t.String()),
         recordedById: t.Optional(t.Number()),
       }),
-    }
+    },
   )
   // ─── DELETE /payments/:id ─────────────────────────────────────────────────
   // Cannot delete payments from a paid invoice
   .delete(
     "/:id",
-    async ({ params }) => {
+    async ({ params, currentUser }) => {
+      requireRole(["super_admin", "finance"], currentUser.role);
       const data = await paymentService.delete(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) }
+    { params: t.Object({ id: t.Numeric() }) },
   );

@@ -53,6 +53,11 @@ export class UserService {
     return updated;
   }
 
+  async logout(id: number): Promise<void> {
+    await this.getById(id);
+    await this.userRepo.incrementTokenVersion(id);
+  }
+
   async deactivate(id: number): Promise<User> {
     await this.getById(id);
     const updated = await this.userRepo.deactivate(id);

@@ -1,30 +1,15 @@
 import { Elysia, t } from "elysia";
-// import { jwt } from "@elysiajs/jwt";
 import { db } from "../db";
 import { TravelPermitRepository } from "../repositories/travel-permit.repository";
 import { TravelPermitService } from "../services/travel-permit.service";
+import { authPlugin, requireRole } from "../plugins/auth.plugin";
 
 const travelPermitService = new TravelPermitService(
-  new TravelPermitRepository(db)
+  new TravelPermitRepository(db),
 );
 
 export const travelPermitRoutes = new Elysia({ prefix: "/travel-permits" })
-  // .use(
-  //   jwt({
-  //     name: "jwt",
-  //     secret: process.env.JWT_SECRET!,
-  //   })
-  // )
-  // ─── Auth guard ───────────────────────────────────────────────────────────
-  // .derive(async ({ headers, jwt }) => {
-  //   const auth = headers["authorization"];
-  //   if (!auth?.startsWith("Bearer ")) throw new Error("Unauthorized");
-  //
-  //   const payload = await jwt.verify(auth.slice(7));
-  //   if (!payload) throw new Error("Unauthorized");
-  //
-  //   return { currentUser: payload };
-  // })
+  .use(authPlugin)
   // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {
     const message =
@@ -32,6 +17,10 @@ export const travelPermitRoutes = new Elysia({ prefix: "/travel-permits" })
 
     if (message === "Unauthorized") {
       set.status = 401;
+      return { success: false, message };
+    }
+    if (message === "Forbidden") {
+      set.status = 403;
       return { success: false, message };
     }
     if (message.toLowerCase().includes("not found")) {
@@ -42,8 +31,10 @@ export const travelPermitRoutes = new Elysia({ prefix: "/travel-permits" })
       set.status = 409;
       return { success: false, message };
     }
-    if (message.toLowerCase().includes("cannot transition") ||
-        message.toLowerCase().includes("only pending")) {
+    if (
+      message.toLowerCase().includes("cannot transition") ||
+      message.toLowerCase().includes("only pending")
+    ) {
       set.status = 422;
       return { success: false, message };
     }
@@ -71,7 +62,7 @@ export const travelPermitRoutes = new Elysia({ prefix: "/travel-permits" })
           t.Literal("completed"),
         ]),
       }),
-    }
+    },
   )
   // ─── GET /travel-permits/supplier/:supplierId ─────────────────────────────
   .get(
@@ -82,7 +73,7 @@ export const travelPermitRoutes = new Elysia({ prefix: "/travel-permits" })
     },
     {
       params: t.Object({ supplierId: t.Numeric() }),
-    }
+    },
   )
   // ─── GET /travel-permits/branch/:branchId ────────────────────────────────
   .get(
@@ -93,20 +84,20 @@ export const travelPermitRoutes = new Elysia({ prefix: "/travel-permits" })
     },
     {
       params: t.Object({ branchId: t.Numeric() }),
-    }
+    },
   )
   // ─── GET /travel-permits/permit/:permitNumber ─────────────────────────────
   .get(
     "/permit/:permitNumber",
     async ({ params }) => {
       const data = await travelPermitService.getByPermitNumber(
-        params.permitNumber
+        params.permitNumber,
       );
       return { success: true, data };
     },
     {
       params: t.Object({ permitNumber: t.String() }),
-    }
+    },
   )
   // ─── GET /travel-permits/:id ──────────────────────────────────────────────
   .get(
@@ -117,12 +108,13 @@ export const travelPermitRoutes = new Elysia({ prefix: "/travel-permits" })
     },
     {
       params: t.Object({ id: t.Numeric() }),
-    }
+    },
   )
   // ─── POST /travel-permits ─────────────────────────────────────────────────
   .post(
     "/",
-    async ({ body, set }) => {
+    async ({ body, set, currentUser }) => {
+      requireRole(["super_admin", "admin_warehouse", "admin_export"], currentUser.role);
       const data = await travelPermitService.create({
         ...body,
         issuedDate: body.issuedDate ? new Date(body.issuedDate) : null,
@@ -142,13 +134,14 @@ export const travelPermitRoutes = new Elysia({ prefix: "/travel-permits" })
         notes: t.Optional(t.String()),
         createdById: t.Optional(t.Number()),
       }),
-    }
+    },
   )
   // ─── PATCH /travel-permits/:id/status ────────────────────────────────────
   // Advance the SJ through its lifecycle: pending → received → completed
   .patch(
     "/:id/status",
-    async ({ params, body }) => {
+    async ({ params, body, currentUser }) => {
+      requireRole(["super_admin", "admin_warehouse", "admin_export"], currentUser.role);
       const data = await travelPermitService.updateStatus(params.id, body.status);
       return { success: true, data };
     },
@@ -161,12 +154,13 @@ export const travelPermitRoutes = new Elysia({ prefix: "/travel-permits" })
           t.Literal("completed"),
         ]),
       }),
-    }
+    },
   )
   // ─── PUT /travel-permits/:id ──────────────────────────────────────────────
   .put(
     "/:id",
-    async ({ params, body }) => {
+    async ({ params, body, currentUser }) => {
+      requireRole(["super_admin", "admin_warehouse", "admin_export"], currentUser.role);
       const data = await travelPermitService.update(params.id, {
         ...body,
         issuedDate: body.issuedDate ? new Date(body.issuedDate) : undefined,
@@ -187,17 +181,18 @@ export const travelPermitRoutes = new Elysia({ prefix: "/travel-permits" })
         receivedDate: t.Optional(t.String()),
         notes: t.Optional(t.String()),
       }),
-    }
+    },
   )
   // ─── DELETE /travel-permits/:id ───────────────────────────────────────────
   // Only pending permits can be deleted
   .delete(
     "/:id",
-    async ({ params }) => {
+    async ({ params, currentUser }) => {
+      requireRole(["super_admin", "admin_warehouse", "admin_export"], currentUser.role);
       const data = await travelPermitService.delete(params.id);
       return { success: true, data };
     },
     {
       params: t.Object({ id: t.Numeric() }),
-    }
+    },
   );

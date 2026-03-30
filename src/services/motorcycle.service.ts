@@ -39,6 +39,21 @@ export class MotorcycleService {
     return this.repo.findAll();
   }
 
+  async getPaginated(
+    filters: {
+      status?: Motorcycle["status"];
+      branchId?: number;
+      typeId?: number;
+      color?: string;
+      search?: string;
+    },
+    page: number,
+    limit: number
+  ): Promise<{ data: Motorcycle[]; meta: { page: number; limit: number; total: number; totalPages: number } }> {
+    const { data, total } = await this.repo.findPaginated(filters, page, limit);
+    return { data, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+  }
+
   async getById(id: number): Promise<Motorcycle> {
     const moto = await this.repo.findById(id);
     if (!moto) throw new Error(`Motorcycle with id ${id} not found`);

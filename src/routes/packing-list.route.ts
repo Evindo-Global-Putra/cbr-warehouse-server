@@ -3,17 +3,28 @@ import { db } from "../db";
 import { PackingListRepository } from "../repositories/packing-list.repository";
 import { InvoiceRepository } from "../repositories/invoice.repository";
 import { PackingListService } from "../services/packing-list.service";
+import { authPlugin, requireRole } from "../plugins/auth.plugin";
 
 const packingListService = new PackingListService(
   new PackingListRepository(db),
-  new InvoiceRepository(db)
+  new InvoiceRepository(db),
 );
 
 export const packingListRoutes = new Elysia({ prefix: "/packing-lists" })
+  .use(authPlugin)
+  // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {
     const message =
       error instanceof Error ? error.message : "Internal server error";
 
+    if (message === "Unauthorized") {
+      set.status = 401;
+      return { success: false, message };
+    }
+    if (message === "Forbidden") {
+      set.status = 403;
+      return { success: false, message };
+    }
     if (message.toLowerCase().includes("not found")) {
       set.status = 404;
       return { success: false, message };
@@ -39,7 +50,7 @@ export const packingListRoutes = new Elysia({ prefix: "/packing-lists" })
       const data = await packingListService.getByInvoice(params.invoiceId);
       return { success: true, data };
     },
-    { params: t.Object({ invoiceId: t.Numeric() }) }
+    { params: t.Object({ invoiceId: t.Numeric() }) },
   )
   // ─── GET /packing-lists/:id ───────────────────────────────────────────────
   .get(
@@ -48,14 +59,15 @@ export const packingListRoutes = new Elysia({ prefix: "/packing-lists" })
       const data = await packingListService.getById(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) }
+    { params: t.Object({ id: t.Numeric() }) },
   )
   // ─── POST /packing-lists ──────────────────────────────────────────────────
   // Creates a packing list linked to an invoice (1:1). Fails if one already exists.
   // totalQuantity / totalGrossWeight / totalNetWeight are auto-updated when items change.
   .post(
     "/",
-    async ({ body, set }) => {
+    async ({ body, set, currentUser }) => {
+      requireRole(["super_admin", "admin_export"], currentUser.role);
       const data = await packingListService.create(body);
       set.status = 201;
       return { success: true, data };
@@ -65,15 +77,16 @@ export const packingListRoutes = new Elysia({ prefix: "/packing-lists" })
         invoiceId: t.Number(),
         shippingTerm: t.Optional(t.String()),
         totalQuantity: t.Optional(t.Number({ minimum: 0 })),
-        totalGrossWeight: t.Optional(t.String()), // kg as numeric string
-        totalNetWeight: t.Optional(t.String()),   // kg as numeric string
+        totalGrossWeight: t.Optional(t.String()),
+        totalNetWeight: t.Optional(t.String()),
       }),
-    }
+    },
   )
   // ─── PUT /packing-lists/:id ───────────────────────────────────────────────
   .put(
     "/:id",
-    async ({ params, body }) => {
+    async ({ params, body, currentUser }) => {
+      requireRole(["super_admin", "admin_export"], currentUser.role);
       const data = await packingListService.update(params.id, body);
       return { success: true, data };
     },
@@ -85,14 +98,15 @@ export const packingListRoutes = new Elysia({ prefix: "/packing-lists" })
         totalGrossWeight: t.Optional(t.String()),
         totalNetWeight: t.Optional(t.String()),
       }),
-    }
+    },
   )
   // ─── DELETE /packing-lists/:id ────────────────────────────────────────────
   .delete(
     "/:id",
-    async ({ params }) => {
+    async ({ params, currentUser }) => {
+      requireRole(["super_admin", "admin_export"], currentUser.role);
       const data = await packingListService.delete(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) }
+    { params: t.Object({ id: t.Numeric() }) },
   );

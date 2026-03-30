@@ -4,20 +4,31 @@ import { ExportOrderMotorcycleRepository } from "../repositories/export-order-mo
 import { ExportOrderRepository } from "../repositories/export-order.repository";
 import { MotorcycleRepository } from "../repositories/motorcycle.repository";
 import { ExportOrderMotorcycleService } from "../services/export-order-motorcycle.service";
+import { authPlugin, requireRole } from "../plugins/auth.plugin";
 
 const exportOrderMotorcycleService = new ExportOrderMotorcycleService(
   new ExportOrderMotorcycleRepository(db),
   new ExportOrderRepository(db),
-  new MotorcycleRepository(db)
+  new MotorcycleRepository(db),
 );
 
 export const exportOrderMotorcycleRoutes = new Elysia({
   prefix: "/export-order-motorcycles",
 })
+  .use(authPlugin)
+  // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {
     const message =
       error instanceof Error ? error.message : "Internal server error";
 
+    if (message === "Unauthorized") {
+      set.status = 401;
+      return { success: false, message };
+    }
+    if (message === "Forbidden") {
+      set.status = 403;
+      return { success: false, message };
+    }
     if (message.toLowerCase().includes("not found")) {
       set.status = 404;
       return { success: false, message };
@@ -44,11 +55,11 @@ export const exportOrderMotorcycleRoutes = new Elysia({
     "/order/:exportOrderId",
     async ({ params }) => {
       const data = await exportOrderMotorcycleService.getByExportOrder(
-        params.exportOrderId
+        params.exportOrderId,
       );
       return { success: true, data };
     },
-    { params: t.Object({ exportOrderId: t.Numeric() }) }
+    { params: t.Object({ exportOrderId: t.Numeric() }) },
   )
   // ─── GET /export-order-motorcycles/:id ────────────────────────────────────
   .get(
@@ -57,16 +68,17 @@ export const exportOrderMotorcycleRoutes = new Elysia({
       const data = await exportOrderMotorcycleService.getById(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) }
+    { params: t.Object({ id: t.Numeric() }) },
   )
   // ─── POST /export-order-motorcycles ───────────────────────────────────────
   // Assign a motorcycle (on_site) to an export order → status becomes 'loading'
   .post(
     "/",
-    async ({ body, set }) => {
+    async ({ body, set, currentUser }) => {
+      requireRole(["super_admin", "admin_export", "admin_warehouse"], currentUser.role);
       const data = await exportOrderMotorcycleService.assign(
         body.exportOrderId,
-        body.motorcycleId
+        body.motorcycleId,
       );
       set.status = 201;
       return { success: true, data };
@@ -76,15 +88,16 @@ export const exportOrderMotorcycleRoutes = new Elysia({
         exportOrderId: t.Number(),
         motorcycleId: t.Number(),
       }),
-    }
+    },
   )
   // ─── DELETE /export-order-motorcycles/:id ─────────────────────────────────
   // Unassign a motorcycle → reverts status back to 'on_site'
   .delete(
     "/:id",
-    async ({ params }) => {
+    async ({ params, currentUser }) => {
+      requireRole(["super_admin", "admin_export", "admin_warehouse"], currentUser.role);
       const data = await exportOrderMotorcycleService.unassign(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) }
+    { params: t.Object({ id: t.Numeric() }) },
   );

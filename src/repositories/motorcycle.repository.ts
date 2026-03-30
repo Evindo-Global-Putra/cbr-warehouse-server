@@ -1,4 +1,5 @@
-import { eq } from "drizzle-orm";
+import { and, count, eq, ilike, or } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import * as schema from "../db/schema";
 import { motorcycles } from "../db/schema";
@@ -15,6 +16,42 @@ export class MotorcycleRepository {
 
   async findAll(): Promise<Motorcycle[]> {
     return this.db.select().from(motorcycles);
+  }
+
+  async findPaginated(
+    filters: {
+      status?: Motorcycle["status"];
+      branchId?: number;
+      typeId?: number;
+      color?: string;
+      search?: string;
+    },
+    page: number,
+    limit: number
+  ): Promise<{ data: Motorcycle[]; total: number }> {
+    const conditions: SQL[] = [];
+    if (filters.status) conditions.push(eq(motorcycles.status, filters.status));
+    if (filters.branchId) conditions.push(eq(motorcycles.branchId, filters.branchId));
+    if (filters.typeId) conditions.push(eq(motorcycles.typeId, filters.typeId));
+    if (filters.color) conditions.push(ilike(motorcycles.color, `%${filters.color}%`));
+    if (filters.search) {
+      const pattern = `%${filters.search}%`;
+      conditions.push(
+        or(
+          ilike(motorcycles.frameNumber, pattern),
+          ilike(motorcycles.engineNumber, pattern),
+          ilike(motorcycles.noInduk, pattern)
+        )!
+      );
+    }
+    const where = conditions.length > 0 ? and(...conditions) : undefined;
+    const offset = (page - 1) * limit;
+
+    const [data, [{ value: total }]] = await Promise.all([
+      this.db.select().from(motorcycles).where(where).limit(limit).offset(offset),
+      this.db.select({ value: count() }).from(motorcycles).where(where),
+    ]);
+    return { data, total: Number(total) };
   }
 
   async findById(id: number): Promise<Motorcycle | undefined> {

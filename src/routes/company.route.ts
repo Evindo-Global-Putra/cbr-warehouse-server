@@ -1,28 +1,13 @@
 import { Elysia, t } from "elysia";
-// import { jwt } from "@elysiajs/jwt";
 import { db } from "../db";
 import { CompanyRepository } from "../repositories/company.repository";
 import { CompanyService } from "../services/company.service";
+import { authPlugin, requireRole } from "../plugins/auth.plugin";
 
 const companyService = new CompanyService(new CompanyRepository(db));
 
 export const companyRoutes = new Elysia({ prefix: "/companies" })
-  // .use(
-  //   jwt({
-  //     name: "jwt",
-  //     secret: process.env.JWT_SECRET!,
-  //   })
-  // )
-  // ─── Auth guard ───────────────────────────────────────────────────────────
-  // .derive(async ({ headers, jwt }) => {
-  //   const auth = headers["authorization"];
-  //   if (!auth?.startsWith("Bearer ")) throw new Error("Unauthorized");
-  //
-  //   const payload = await jwt.verify(auth.slice(7));
-  //   if (!payload) throw new Error("Unauthorized");
-  //
-  //   return { currentUser: payload };
-  // })
+  .use(authPlugin)
   // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {
     const message =
@@ -30,6 +15,10 @@ export const companyRoutes = new Elysia({ prefix: "/companies" })
 
     if (message === "Unauthorized") {
       set.status = 401;
+      return { success: false, message };
+    }
+    if (message === "Forbidden") {
+      set.status = 403;
       return { success: false, message };
     }
     if (message.toLowerCase().includes("not found")) {
@@ -61,7 +50,7 @@ export const companyRoutes = new Elysia({ prefix: "/companies" })
     },
     {
       query: t.Object({ name: t.String({ minLength: 1 }) }),
-    }
+    },
   )
   // ─── GET /companies/country/:country ──────────────────────────────────────
   .get(
@@ -72,7 +61,7 @@ export const companyRoutes = new Elysia({ prefix: "/companies" })
     },
     {
       params: t.Object({ country: t.String() }),
-    }
+    },
   )
   // ─── GET /companies/npwp/:npwp ────────────────────────────────────────────
   .get(
@@ -83,7 +72,7 @@ export const companyRoutes = new Elysia({ prefix: "/companies" })
     },
     {
       params: t.Object({ npwp: t.String() }),
-    }
+    },
   )
   // ─── GET /companies/:id ───────────────────────────────────────────────────
   .get(
@@ -94,12 +83,13 @@ export const companyRoutes = new Elysia({ prefix: "/companies" })
     },
     {
       params: t.Object({ id: t.Numeric() }),
-    }
+    },
   )
   // ─── POST /companies ──────────────────────────────────────────────────────
   .post(
     "/",
-    async ({ body, set }) => {
+    async ({ body, set, currentUser }) => {
+      requireRole(["super_admin", "admin_export"], currentUser.role);
       const data = await companyService.create(body);
       set.status = 201;
       return { success: true, data };
@@ -115,12 +105,13 @@ export const companyRoutes = new Elysia({ prefix: "/companies" })
         npwp: t.Optional(t.String()),
         notes: t.Optional(t.String()),
       }),
-    }
+    },
   )
   // ─── PUT /companies/:id ───────────────────────────────────────────────────
   .put(
     "/:id",
-    async ({ params, body }) => {
+    async ({ params, body, currentUser }) => {
+      requireRole(["super_admin", "admin_export"], currentUser.role);
       const data = await companyService.update(params.id, body);
       return { success: true, data };
     },
@@ -136,16 +127,17 @@ export const companyRoutes = new Elysia({ prefix: "/companies" })
         npwp: t.Optional(t.String()),
         notes: t.Optional(t.String()),
       }),
-    }
+    },
   )
   // ─── DELETE /companies/:id ────────────────────────────────────────────────
   .delete(
     "/:id",
-    async ({ params }) => {
+    async ({ params, currentUser }) => {
+      requireRole(["super_admin", "admin_export"], currentUser.role);
       const data = await companyService.delete(params.id);
       return { success: true, data };
     },
     {
       params: t.Object({ id: t.Numeric() }),
-    }
+    },
   );

@@ -3,10 +3,11 @@ import { db } from "../db";
 import { ShipmentRepository } from "../repositories/shipment.repository";
 import { LoadingFormRepository } from "../repositories/loading-form.repository";
 import { ShipmentService } from "../services/shipment.service";
+import { authPlugin, requireRole } from "../plugins/auth.plugin";
 
 const shipmentService = new ShipmentService(
   new ShipmentRepository(db),
-  new LoadingFormRepository(db)
+  new LoadingFormRepository(db),
 );
 
 const shipmentStatusValues = [
@@ -17,10 +18,20 @@ const shipmentStatusValues = [
 ] as const;
 
 export const shipmentRoutes = new Elysia({ prefix: "/shipments" })
+  .use(authPlugin)
+  // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {
     const message =
       error instanceof Error ? error.message : "Internal server error";
 
+    if (message === "Unauthorized") {
+      set.status = 401;
+      return { success: false, message };
+    }
+    if (message === "Forbidden") {
+      set.status = 403;
+      return { success: false, message };
+    }
     if (message.toLowerCase().includes("not found")) {
       set.status = 404;
       return { success: false, message };
@@ -53,7 +64,7 @@ export const shipmentRoutes = new Elysia({ prefix: "/shipments" })
       params: t.Object({
         status: t.Union(shipmentStatusValues.map((s) => t.Literal(s))),
       }),
-    }
+    },
   )
   // ─── GET /shipments/loading-form/:loadingFormId ───────────────────────────
   .get(
@@ -62,7 +73,7 @@ export const shipmentRoutes = new Elysia({ prefix: "/shipments" })
       const data = await shipmentService.getByLoadingForm(params.loadingFormId);
       return { success: true, data };
     },
-    { params: t.Object({ loadingFormId: t.Numeric() }) }
+    { params: t.Object({ loadingFormId: t.Numeric() }) },
   )
   // ─── GET /shipments/:id ───────────────────────────────────────────────────
   .get(
@@ -71,13 +82,14 @@ export const shipmentRoutes = new Elysia({ prefix: "/shipments" })
       const data = await shipmentService.getById(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) }
+    { params: t.Object({ id: t.Numeric() }) },
   )
   // ─── POST /shipments ──────────────────────────────────────────────────────
   // Only creatable from a validated loading form
   .post(
     "/",
-    async ({ body, set }) => {
+    async ({ body, set, currentUser }) => {
+      requireRole(["super_admin", "admin_export"], currentUser.role);
       const { estimatedArrival, ...rest } = body;
       const data = await shipmentService.create({
         ...rest,
@@ -95,42 +107,46 @@ export const shipmentRoutes = new Elysia({ prefix: "/shipments" })
         estimatedArrival: t.Optional(t.String()),
         notes: t.Optional(t.String()),
       }),
-    }
+    },
   )
   // ─── PATCH /shipments/:id/in-transit ──────────────────────────────────────
   // pending → in_transit; sets shippedAt to now
   .patch(
     "/:id/in-transit",
-    async ({ params }) => {
+    async ({ params, currentUser }) => {
+      requireRole(["super_admin", "admin_export"], currentUser.role);
       const data = await shipmentService.markInTransit(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) }
+    { params: t.Object({ id: t.Numeric() }) },
   )
   // ─── PATCH /shipments/:id/arrived ────────────────────────────────────────
   // in_transit → arrived; sets actualArrival to now
   .patch(
     "/:id/arrived",
-    async ({ params }) => {
+    async ({ params, currentUser }) => {
+      requireRole(["super_admin", "admin_export"], currentUser.role);
       const data = await shipmentService.markArrived(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) }
+    { params: t.Object({ id: t.Numeric() }) },
   )
   // ─── PATCH /shipments/:id/delivered ──────────────────────────────────────
   // arrived → delivered
   .patch(
     "/:id/delivered",
-    async ({ params }) => {
+    async ({ params, currentUser }) => {
+      requireRole(["super_admin", "admin_export"], currentUser.role);
       const data = await shipmentService.markDelivered(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) }
+    { params: t.Object({ id: t.Numeric() }) },
   )
   // ─── PUT /shipments/:id ───────────────────────────────────────────────────
   .put(
     "/:id",
-    async ({ params, body }) => {
+    async ({ params, body, currentUser }) => {
+      requireRole(["super_admin", "admin_export"], currentUser.role);
       const { estimatedArrival, ...rest } = body;
       const data = await shipmentService.update(params.id, {
         ...rest,
@@ -147,15 +163,16 @@ export const shipmentRoutes = new Elysia({ prefix: "/shipments" })
         estimatedArrival: t.Optional(t.String()),
         notes: t.Optional(t.String()),
       }),
-    }
+    },
   )
   // ─── DELETE /shipments/:id ────────────────────────────────────────────────
   // Only pending shipments can be deleted
   .delete(
     "/:id",
-    async ({ params }) => {
+    async ({ params, currentUser }) => {
+      requireRole(["super_admin", "admin_export"], currentUser.role);
       const data = await shipmentService.delete(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) }
+    { params: t.Object({ id: t.Numeric() }) },
   );
