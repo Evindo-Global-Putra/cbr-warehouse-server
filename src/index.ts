@@ -22,9 +22,15 @@ import { packingListItemRoutes } from "./routes/packing-list-item.route";
 import { paymentRoutes } from "./routes/payment.route";
 import { warehouseTransferRoutes } from "./routes/warehouse-transfer.route";
 import { warehouseTransferMotorcycleRoutes } from "./routes/warehouse-transfer-motorcycle.route";
+import { userRoutes } from "./routes/user.route";
 
 const app = new Elysia()
-  .use(cors())
+  .use(
+    cors({
+      origin: "http://localhost:3000", // izinkan frontend
+      credentials: true, // jika pakai cookie/JWT
+    }),
+  )
   .use(
     swagger({
       documentation: {
@@ -67,7 +73,8 @@ const app = new Elysia()
       .use(packingListItemRoutes)
       .use(paymentRoutes)
       .use(warehouseTransferRoutes)
-      .use(warehouseTransferMotorcycleRoutes),
+      .use(warehouseTransferMotorcycleRoutes)
+      .use(userRoutes),
   )
   .listen(process.env.PORT ?? 8000);
 
