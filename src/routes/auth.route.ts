@@ -42,6 +42,7 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
           passwordHash,
           role: body.role ?? "super_admin",
           branchId: body.branchId ?? null,
+          isActive: body.isActive ?? true,
         })
         .catch((err: Error) => {
           throw err;
@@ -65,6 +66,7 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
           ]),
         ),
         branchId: t.Optional(t.Number()),
+        isActive: t.Optional(t.Boolean({ default: true })),
       }),
     },
   )
