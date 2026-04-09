@@ -10,7 +10,10 @@ const invoiceItemService = new InvoiceItemService(
   new InvoiceRepository(db),
 );
 
-export const invoiceItemRoutes = new Elysia({ prefix: "/invoice-items" })
+export const invoiceItemRoutes = new Elysia({
+  prefix: "/invoice-items",
+  detail: { tags: ["Invoices"] },
+})
   .use(authPlugin)
   // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {

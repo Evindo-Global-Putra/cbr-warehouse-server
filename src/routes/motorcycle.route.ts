@@ -10,7 +10,10 @@ const motorcycleService = new MotorcycleService(
   new WarehouseEntryRepository(db),
 );
 
-export const motorcycleRoutes = new Elysia({ prefix: "/motorcycles" })
+export const motorcycleRoutes = new Elysia({
+  prefix: "/motorcycles",
+  detail: { tags: ["Motorcycles"] },
+})
   .use(authPlugin)
   // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {

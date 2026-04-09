@@ -10,7 +10,10 @@ const exportOrderItemService = new ExportOrderItemService(
   new ExportOrderRepository(db),
 );
 
-export const exportOrderItemRoutes = new Elysia({ prefix: "/export-order-items" })
+export const exportOrderItemRoutes = new Elysia({
+  prefix: "/export-order-items",
+  detail: { tags: ["Export Orders"] },
+})
   .use(authPlugin)
   // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {

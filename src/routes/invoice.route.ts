@@ -18,7 +18,10 @@ const invoiceStatusValues = [
   "cancelled",
 ] as const;
 
-export const invoiceRoutes = new Elysia({ prefix: "/invoices" })
+export const invoiceRoutes = new Elysia({
+  prefix: "/invoices",
+  detail: { tags: ["Invoices"] },
+})
   .use(authPlugin)
   // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {

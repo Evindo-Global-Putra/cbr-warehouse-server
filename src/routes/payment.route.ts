@@ -17,7 +17,10 @@ const paymentMethodValues = [
   "other",
 ] as const;
 
-export const paymentRoutes = new Elysia({ prefix: "/payments" })
+export const paymentRoutes = new Elysia({
+  prefix: "/payments",
+  detail: { tags: ["Payments"] },
+})
   .use(authPlugin)
   // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {

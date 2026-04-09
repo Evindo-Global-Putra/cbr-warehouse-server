@@ -8,7 +8,10 @@ const warehouseEntryService = new WarehouseEntryService(
   new WarehouseEntryRepository(db),
 );
 
-export const warehouseEntryRoutes = new Elysia({ prefix: "/warehouse-entries" })
+export const warehouseEntryRoutes = new Elysia({
+  prefix: "/warehouse-entries",
+  detail: { tags: ["Warehouse Entries"] },
+})
   .use(authPlugin)
   // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {

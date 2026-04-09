@@ -19,7 +19,10 @@ const transferStatusValues = [
   "cancelled",
 ] as const;
 
-export const warehouseTransferRoutes = new Elysia({ prefix: "/warehouse-transfers" })
+export const warehouseTransferRoutes = new Elysia({
+  prefix: "/warehouse-transfers",
+  detail: { tags: ["Warehouse Transfers"] },
+})
   .use(authPlugin)
   // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {

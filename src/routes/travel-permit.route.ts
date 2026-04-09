@@ -8,7 +8,10 @@ const travelPermitService = new TravelPermitService(
   new TravelPermitRepository(db),
 );
 
-export const travelPermitRoutes = new Elysia({ prefix: "/travel-permits" })
+export const travelPermitRoutes = new Elysia({
+  prefix: "/travel-permits",
+  detail: { tags: ["Travel Permits"] },
+})
   .use(authPlugin)
   // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {

@@ -10,7 +10,10 @@ const packingListService = new PackingListService(
   new InvoiceRepository(db),
 );
 
-export const packingListRoutes = new Elysia({ prefix: "/packing-lists" })
+export const packingListRoutes = new Elysia({
+  prefix: "/packing-lists",
+  detail: { tags: ["Packing Lists"] },
+})
   .use(authPlugin)
   // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {

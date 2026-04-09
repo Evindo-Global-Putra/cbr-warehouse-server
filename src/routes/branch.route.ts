@@ -6,7 +6,10 @@ import { authPlugin, requireRole } from "../plugins/auth.plugin";
 
 const branchService = new BranchService(new BranchRepository(db));
 
-export const branchRoutes = new Elysia({ prefix: "/branches" })
+export const branchRoutes = new Elysia({
+  prefix: "/branches",
+  detail: { tags: ["Branches"] },
+})
   .use(authPlugin)
   // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {

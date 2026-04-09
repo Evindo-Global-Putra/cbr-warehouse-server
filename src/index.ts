@@ -37,7 +37,80 @@ const app = new Elysia()
         info: {
           title: "CBR Warehouse API",
           version: "1.0.0",
+          description:
+            "Backend API for CBR Motorcycle Import & Export Warehouse Management System.",
         },
+        tags: [
+          {
+            name: "Authentication",
+            description: "Login, register, logout, and current-user endpoints",
+          },
+          {
+            name: "Users",
+            description: "Employee account management",
+          },
+          {
+            name: "Branches",
+            description: "Warehouse branch locations (Jakarta, Surabaya, etc.)",
+          },
+          {
+            name: "Companies",
+            description: "B2B client / dealer company data",
+          },
+          {
+            name: "Suppliers",
+            description: "Motorcycle supplier management",
+          },
+          {
+            name: "Motorcycle Types",
+            description: "Motorcycle brand, model, and variant catalog",
+          },
+          {
+            name: "Motorcycles",
+            description:
+              "Individual motorcycle units — frame no, engine no, barcode, photos",
+          },
+          {
+            name: "Accessories",
+            description: "Accessory inventory (helmets, parts, etc.)",
+          },
+          {
+            name: "Travel Permits",
+            description: "Surat Jalan (SJ) — incoming delivery notes from suppliers",
+          },
+          {
+            name: "Warehouse Entries",
+            description: "Warehouse entry scanning sessions per travel permit",
+          },
+          {
+            name: "Warehouse Transfers",
+            description: "Stock movement between warehouse branches",
+          },
+          {
+            name: "Export Orders",
+            description: "B2B client export requests, line items, and unit assignments",
+          },
+          {
+            name: "Loading Forms",
+            description: "Loading preparation forms before export shipment",
+          },
+          {
+            name: "Shipments",
+            description: "Export shipment tracking (vessel, ETD, ports)",
+          },
+          {
+            name: "Invoices",
+            description: "Export invoices and line items (USD pricing)",
+          },
+          {
+            name: "Packing Lists",
+            description: "Packing lists and line items (gross/net weight in KG)",
+          },
+          {
+            name: "Payments",
+            description: "Payment records and audit trail",
+          },
+        ],
         components: {
           securitySchemes: {
             bearerAuth: {

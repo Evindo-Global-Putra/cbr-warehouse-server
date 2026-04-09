@@ -6,7 +6,10 @@ import { UserService } from "../services/user.service";
 
 const userService = new UserService(new UserRepository(db));
 
-export const authRoutes = new Elysia({ prefix: "/auth" })
+export const authRoutes = new Elysia({
+  prefix: "/auth",
+  detail: { tags: ["Authentication"] },
+})
   .use(
     jwt({
       name: "jwt",

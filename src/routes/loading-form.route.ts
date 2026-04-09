@@ -10,7 +10,10 @@ const loadingFormService = new LoadingFormService(
   new ExportOrderRepository(db),
 );
 
-export const loadingFormRoutes = new Elysia({ prefix: "/loading-forms" })
+export const loadingFormRoutes = new Elysia({
+  prefix: "/loading-forms",
+  detail: { tags: ["Loading Forms"] },
+})
   .use(authPlugin)
   // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {

@@ -16,7 +16,10 @@ const exportOrderStatusValues = [
   "cancelled",
 ] as const;
 
-export const exportOrderRoutes = new Elysia({ prefix: "/export-orders" })
+export const exportOrderRoutes = new Elysia({
+  prefix: "/export-orders",
+  detail: { tags: ["Export Orders"] },
+})
   .use(authPlugin)
   // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {

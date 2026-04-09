@@ -11,7 +11,10 @@ const safeUser = (user: Record<string, unknown>) => {
   return safe;
 };
 
-export const userRoutes = new Elysia({ prefix: "/users" })
+export const userRoutes = new Elysia({
+  prefix: "/users",
+  detail: { tags: ["Users"] },
+})
   .use(authPlugin)
   // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {

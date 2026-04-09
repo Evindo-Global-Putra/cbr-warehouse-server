@@ -17,7 +17,10 @@ const shipmentStatusValues = [
   "delivered",
 ] as const;
 
-export const shipmentRoutes = new Elysia({ prefix: "/shipments" })
+export const shipmentRoutes = new Elysia({
+  prefix: "/shipments",
+  detail: { tags: ["Shipments"] },
+})
   .use(authPlugin)
   // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {

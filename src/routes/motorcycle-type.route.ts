@@ -8,7 +8,10 @@ const motorcycleTypeService = new MotorcycleTypeService(
   new MotorcycleTypeRepository(db),
 );
 
-export const motorcycleTypeRoutes = new Elysia({ prefix: "/motorcycle-types" })
+export const motorcycleTypeRoutes = new Elysia({
+  prefix: "/motorcycle-types",
+  detail: { tags: ["Motorcycle Types"] },
+})
   .use(authPlugin)
   // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {

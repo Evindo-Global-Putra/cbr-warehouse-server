@@ -6,7 +6,10 @@ import { authPlugin, requireRole } from "../plugins/auth.plugin";
 
 const companyService = new CompanyService(new CompanyRepository(db));
 
-export const companyRoutes = new Elysia({ prefix: "/companies" })
+export const companyRoutes = new Elysia({
+  prefix: "/companies",
+  detail: { tags: ["Companies"] },
+})
   .use(authPlugin)
   // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {

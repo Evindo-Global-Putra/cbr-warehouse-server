@@ -6,7 +6,10 @@ import { authPlugin, requireRole } from "../plugins/auth.plugin";
 
 const accessoryService = new AccessoryService(new AccessoryRepository(db));
 
-export const accessoryRoutes = new Elysia({ prefix: "/accessories" })
+export const accessoryRoutes = new Elysia({
+  prefix: "/accessories",
+  detail: { tags: ["Accessories"] },
+})
   .use(authPlugin)
   // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {

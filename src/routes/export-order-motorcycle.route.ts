@@ -14,6 +14,7 @@ const exportOrderMotorcycleService = new ExportOrderMotorcycleService(
 
 export const exportOrderMotorcycleRoutes = new Elysia({
   prefix: "/export-order-motorcycles",
+  detail: { tags: ["Export Orders"] },
 })
   .use(authPlugin)
   // ─── Error handler ────────────────────────────────────────────────────────

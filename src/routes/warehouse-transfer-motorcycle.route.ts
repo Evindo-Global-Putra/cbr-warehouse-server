@@ -14,6 +14,7 @@ const wtmService = new WarehouseTransferMotorcycleService(
 
 export const warehouseTransferMotorcycleRoutes = new Elysia({
   prefix: "/warehouse-transfer-motorcycles",
+  detail: { tags: ["Warehouse Transfers"] },
 })
   .use(authPlugin)
   // ─── Error handler ────────────────────────────────────────────────────────

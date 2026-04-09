@@ -6,7 +6,10 @@ import { authPlugin, requireRole } from "../plugins/auth.plugin";
 
 const supplierService = new SupplierService(new SupplierRepository(db));
 
-export const supplierRoutes = new Elysia({ prefix: "/suppliers" })
+export const supplierRoutes = new Elysia({
+  prefix: "/suppliers",
+  detail: { tags: ["Suppliers"] },
+})
   .use(authPlugin)
   // ─── Error handler ────────────────────────────────────────────────────────
   .onError(({ error, set }) => {
