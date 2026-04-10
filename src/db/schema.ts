@@ -398,6 +398,8 @@ export const packingLists = pgTable("packing_lists", {
     .unique() // 1:1 with invoice
     .references(() => invoices.id),
   shippingTerm: varchar("shipping_term", { length: 50 }), // mirrors invoice (e.g., CNF BEIRUT)
+  containerNumber: varchar("container_number", { length: 100 }), // e.g., SEKU4539313/R5627897
+  shippingMarks: text("shipping_marks"),                          // consignee address block printed as shipping marks
   // Totals (computed / stored for quick access)
   totalQuantity: integer("total_quantity").notNull().default(0),
   totalGrossWeight: numeric("total_gross_weight", { precision: 10, scale: 2 }), // kg
