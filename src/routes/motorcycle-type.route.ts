@@ -79,7 +79,7 @@ export const motorcycleTypeRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
     },
   )
   // ─── POST /motorcycle-types ───────────────────────────────────────────────
@@ -109,7 +109,7 @@ export const motorcycleTypeRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
       body: t.Object({
         brand: t.Optional(t.String({ minLength: 1 })),
         model: t.Optional(t.String({ minLength: 1 })),
@@ -127,6 +127,6 @@ export const motorcycleTypeRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
     },
   );

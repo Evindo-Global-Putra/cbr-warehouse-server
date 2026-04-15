@@ -15,7 +15,7 @@ export class LoadingFormRepository {
     return this.db.select().from(loadingForms);
   }
 
-  async findById(id: number): Promise<LoadingForm | undefined> {
+  async findById(id: string): Promise<LoadingForm | undefined> {
     const result = await this.db
       .select()
       .from(loadingForms)
@@ -23,14 +23,14 @@ export class LoadingFormRepository {
     return result[0];
   }
 
-  async findByExportOrder(exportOrderId: number): Promise<LoadingForm[]> {
+  async findByExportOrder(exportOrderId: string): Promise<LoadingForm[]> {
     return this.db
       .select()
       .from(loadingForms)
       .where(eq(loadingForms.exportOrderId, exportOrderId));
   }
 
-  async findByBranch(branchId: number): Promise<LoadingForm[]> {
+  async findByBranch(branchId: string): Promise<LoadingForm[]> {
     return this.db
       .select()
       .from(loadingForms)
@@ -49,7 +49,7 @@ export class LoadingFormRepository {
     return result[0];
   }
 
-  async update(id: number, data: UpdateLoadingForm): Promise<LoadingForm | undefined> {
+  async update(id: string, data: UpdateLoadingForm): Promise<LoadingForm | undefined> {
     const result = await this.db
       .update(loadingForms)
       .set({ ...data, updatedAt: new Date() })
@@ -58,7 +58,7 @@ export class LoadingFormRepository {
     return result[0];
   }
 
-  async delete(id: number): Promise<LoadingForm | undefined> {
+  async delete(id: string): Promise<LoadingForm | undefined> {
     const result = await this.db
       .delete(loadingForms)
       .where(eq(loadingForms.id, id))

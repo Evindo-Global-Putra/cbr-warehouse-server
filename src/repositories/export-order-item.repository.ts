@@ -15,7 +15,7 @@ export class ExportOrderItemRepository {
     return this.db.select().from(exportOrderItems);
   }
 
-  async findById(id: number): Promise<ExportOrderItem | undefined> {
+  async findById(id: string): Promise<ExportOrderItem | undefined> {
     const result = await this.db
       .select()
       .from(exportOrderItems)
@@ -23,7 +23,7 @@ export class ExportOrderItemRepository {
     return result[0];
   }
 
-  async findByExportOrder(exportOrderId: number): Promise<ExportOrderItem[]> {
+  async findByExportOrder(exportOrderId: string): Promise<ExportOrderItem[]> {
     return this.db
       .select()
       .from(exportOrderItems)
@@ -39,7 +39,7 @@ export class ExportOrderItemRepository {
   }
 
   async update(
-    id: number,
+    id: string,
     data: UpdateExportOrderItem
   ): Promise<ExportOrderItem | undefined> {
     const result = await this.db
@@ -50,7 +50,7 @@ export class ExportOrderItemRepository {
     return result[0];
   }
 
-  async delete(id: number): Promise<ExportOrderItem | undefined> {
+  async delete(id: string): Promise<ExportOrderItem | undefined> {
     const result = await this.db
       .delete(exportOrderItems)
       .where(eq(exportOrderItems.id, id))

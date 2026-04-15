@@ -15,7 +15,7 @@ export class WarehouseTransferRepository {
     return this.db.select().from(warehouseTransfers);
   }
 
-  async findById(id: number): Promise<WarehouseTransfer | undefined> {
+  async findById(id: string): Promise<WarehouseTransfer | undefined> {
     const result = await this.db
       .select()
       .from(warehouseTransfers)
@@ -23,14 +23,14 @@ export class WarehouseTransferRepository {
     return result[0];
   }
 
-  async findByFromBranch(fromBranchId: number): Promise<WarehouseTransfer[]> {
+  async findByFromBranch(fromBranchId: string): Promise<WarehouseTransfer[]> {
     return this.db
       .select()
       .from(warehouseTransfers)
       .where(eq(warehouseTransfers.fromBranchId, fromBranchId));
   }
 
-  async findByToBranch(toBranchId: number): Promise<WarehouseTransfer[]> {
+  async findByToBranch(toBranchId: string): Promise<WarehouseTransfer[]> {
     return this.db
       .select()
       .from(warehouseTransfers)
@@ -49,7 +49,7 @@ export class WarehouseTransferRepository {
     return result[0];
   }
 
-  async update(id: number, data: UpdateWarehouseTransfer): Promise<WarehouseTransfer | undefined> {
+  async update(id: string, data: UpdateWarehouseTransfer): Promise<WarehouseTransfer | undefined> {
     const result = await this.db
       .update(warehouseTransfers)
       .set(data)
@@ -58,7 +58,7 @@ export class WarehouseTransferRepository {
     return result[0];
   }
 
-  async delete(id: number): Promise<WarehouseTransfer | undefined> {
+  async delete(id: string): Promise<WarehouseTransfer | undefined> {
     const result = await this.db
       .delete(warehouseTransfers)
       .where(eq(warehouseTransfers.id, id))

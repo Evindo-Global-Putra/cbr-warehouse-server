@@ -21,7 +21,7 @@ export class MotorcycleTypeService {
     return { data, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };
   }
 
-  async getById(id: number): Promise<MotorcycleType> {
+  async getById(id: string): Promise<MotorcycleType> {
     const type = await this.repo.findById(id);
     if (!type) throw new Error(`Motorcycle type with id ${id} not found`);
     return type;
@@ -44,7 +44,7 @@ export class MotorcycleTypeService {
     return this.repo.create(data);
   }
 
-  async update(id: number, data: UpdateMotorcycleType): Promise<MotorcycleType> {
+  async update(id: string, data: UpdateMotorcycleType): Promise<MotorcycleType> {
     const current = await this.getById(id);
 
     if (data.brand || data.model || "variant" in data) {
@@ -63,7 +63,7 @@ export class MotorcycleTypeService {
     return updated;
   }
 
-  async delete(id: number): Promise<MotorcycleType> {
+  async delete(id: string): Promise<MotorcycleType> {
     await this.getById(id);
     const deleted = await this.repo.delete(id);
     if (!deleted) throw new Error(`Failed to delete motorcycle type with id ${id}`);

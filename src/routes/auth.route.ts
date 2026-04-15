@@ -68,7 +68,7 @@ export const authRoutes = new Elysia({
             t.Literal("finance"),
           ]),
         ),
-        branchId: t.Optional(t.Number()),
+        branchId: t.Optional(t.String()),
         isActive: t.Optional(t.Boolean({ default: true })),
       }),
     },

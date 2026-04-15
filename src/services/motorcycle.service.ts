@@ -42,8 +42,8 @@ export class MotorcycleService {
   async getPaginated(
     filters: {
       status?: Motorcycle["status"];
-      branchId?: number;
-      typeId?: number;
+      branchId?: string;
+      typeId?: string;
       color?: string;
       search?: string;
     },
@@ -54,13 +54,13 @@ export class MotorcycleService {
     return { data, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };
   }
 
-  async getById(id: number): Promise<Motorcycle> {
+  async getById(id: string): Promise<Motorcycle> {
     const moto = await this.repo.findById(id);
     if (!moto) throw new Error(`Motorcycle with id ${id} not found`);
     return moto;
   }
 
-  async getByBranch(branchId: number): Promise<Motorcycle[]> {
+  async getByBranch(branchId: string): Promise<Motorcycle[]> {
     return this.repo.findByBranch(branchId);
   }
 
@@ -68,11 +68,11 @@ export class MotorcycleService {
     return this.repo.findByStatus(status);
   }
 
-  async getByEntry(entryId: number): Promise<Motorcycle[]> {
+  async getByEntry(entryId: string): Promise<Motorcycle[]> {
     return this.repo.findByEntry(entryId);
   }
 
-  async getByType(typeId: number): Promise<Motorcycle[]> {
+  async getByType(typeId: string): Promise<Motorcycle[]> {
     return this.repo.findByType(typeId);
   }
 
@@ -140,7 +140,7 @@ export class MotorcycleService {
     return motorcycle;
   }
 
-  async update(id: number, data: UpdateMotorcycle): Promise<Motorcycle> {
+  async update(id: string, data: UpdateMotorcycle): Promise<Motorcycle> {
     await this.getById(id);
 
     if (data.frameNumber) {
@@ -162,7 +162,7 @@ export class MotorcycleService {
   }
 
   async updateStatus(
-    id: number,
+    id: string,
     status: Motorcycle["status"]
   ): Promise<Motorcycle> {
     const moto = await this.getById(id);
@@ -178,7 +178,7 @@ export class MotorcycleService {
     return updated;
   }
 
-  async delete(id: number): Promise<Motorcycle> {
+  async delete(id: string): Promise<Motorcycle> {
     const moto = await this.getById(id);
     if (moto.status !== "on_site") {
       throw new Error(

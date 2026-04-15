@@ -21,8 +21,8 @@ export class MotorcycleRepository {
   async findPaginated(
     filters: {
       status?: Motorcycle["status"];
-      branchId?: number;
-      typeId?: number;
+      branchId?: string;
+      typeId?: string;
       color?: string;
       search?: string;
     },
@@ -54,7 +54,7 @@ export class MotorcycleRepository {
     return { data, total: Number(total) };
   }
 
-  async findById(id: number): Promise<Motorcycle | undefined> {
+  async findById(id: string): Promise<Motorcycle | undefined> {
     const result = await this.db
       .select()
       .from(motorcycles)
@@ -94,7 +94,7 @@ export class MotorcycleRepository {
     return result[0];
   }
 
-  async findByBranch(branchId: number): Promise<Motorcycle[]> {
+  async findByBranch(branchId: string): Promise<Motorcycle[]> {
     return this.db
       .select()
       .from(motorcycles)
@@ -108,14 +108,14 @@ export class MotorcycleRepository {
       .where(eq(motorcycles.status, status));
   }
 
-  async findByEntry(entryId: number): Promise<Motorcycle[]> {
+  async findByEntry(entryId: string): Promise<Motorcycle[]> {
     return this.db
       .select()
       .from(motorcycles)
       .where(eq(motorcycles.entryId, entryId));
   }
 
-  async findByType(typeId: number): Promise<Motorcycle[]> {
+  async findByType(typeId: string): Promise<Motorcycle[]> {
     return this.db
       .select()
       .from(motorcycles)
@@ -131,7 +131,7 @@ export class MotorcycleRepository {
   }
 
   async update(
-    id: number,
+    id: string,
     data: UpdateMotorcycle
   ): Promise<Motorcycle | undefined> {
     const result = await this.db
@@ -142,7 +142,7 @@ export class MotorcycleRepository {
     return result[0];
   }
 
-  async delete(id: number): Promise<Motorcycle | undefined> {
+  async delete(id: string): Promise<Motorcycle | undefined> {
     const result = await this.db
       .delete(motorcycles)
       .where(eq(motorcycles.id, id))

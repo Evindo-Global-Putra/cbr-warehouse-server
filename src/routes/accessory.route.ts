@@ -56,7 +56,7 @@ export const accessoryRoutes = new Elysia({
       query: t.Object({
         page: t.Optional(t.Numeric({ minimum: 1 })),
         limit: t.Optional(t.Numeric({ minimum: 1, maximum: 100 })),
-        branchId: t.Optional(t.Numeric()),
+        branchId: t.Optional(t.String()),
         category: t.Optional(t.String()),
         search: t.Optional(t.String()),
       }),
@@ -69,7 +69,7 @@ export const accessoryRoutes = new Elysia({
       const data = await accessoryService.getByBranch(params.branchId);
       return { success: true, data };
     },
-    { params: t.Object({ branchId: t.Numeric() }) },
+    { params: t.Object({ branchId: t.String() }) },
   )
   // ─── GET /accessories/sku/:sku ────────────────────────────────────────────
   .get(
@@ -87,7 +87,7 @@ export const accessoryRoutes = new Elysia({
       const data = await accessoryService.getById(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) },
+    { params: t.Object({ id: t.String() }) },
   )
   // ─── POST /accessories ────────────────────────────────────────────────────
   .post(
@@ -109,7 +109,7 @@ export const accessoryRoutes = new Elysia({
         unitPrice: t.Optional(t.String()),
         grossWeightPerUnit: t.Optional(t.String()),
         netWeightPerUnit: t.Optional(t.String()),
-        branchId: t.Optional(t.Number()),
+        branchId: t.Optional(t.String()),
       }),
     },
   )
@@ -123,7 +123,7 @@ export const accessoryRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
       body: t.Object({ delta: t.Number() }),
     },
   )
@@ -136,7 +136,7 @@ export const accessoryRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
       body: t.Object({
         name: t.Optional(t.String()),
         sku: t.Optional(t.String()),
@@ -147,7 +147,7 @@ export const accessoryRoutes = new Elysia({
         unitPrice: t.Optional(t.String()),
         grossWeightPerUnit: t.Optional(t.Nullable(t.String())),
         netWeightPerUnit: t.Optional(t.Nullable(t.String())),
-        branchId: t.Optional(t.Number()),
+        branchId: t.Optional(t.String()),
       }),
     },
   )
@@ -159,5 +159,5 @@ export const accessoryRoutes = new Elysia({
       const data = await accessoryService.delete(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) },
+    { params: t.Object({ id: t.String() }) },
   );

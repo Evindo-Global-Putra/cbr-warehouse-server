@@ -14,7 +14,7 @@ export class ExportOrderMotorcycleRepository {
     return this.db.select().from(exportOrderMotorcycles);
   }
 
-  async findById(id: number): Promise<ExportOrderMotorcycle | undefined> {
+  async findById(id: string): Promise<ExportOrderMotorcycle | undefined> {
     const result = await this.db
       .select()
       .from(exportOrderMotorcycles)
@@ -22,14 +22,14 @@ export class ExportOrderMotorcycleRepository {
     return result[0];
   }
 
-  async findByExportOrder(exportOrderId: number): Promise<ExportOrderMotorcycle[]> {
+  async findByExportOrder(exportOrderId: string): Promise<ExportOrderMotorcycle[]> {
     return this.db
       .select()
       .from(exportOrderMotorcycles)
       .where(eq(exportOrderMotorcycles.exportOrderId, exportOrderId));
   }
 
-  async findByMotorcycle(motorcycleId: number): Promise<ExportOrderMotorcycle | undefined> {
+  async findByMotorcycle(motorcycleId: string): Promise<ExportOrderMotorcycle | undefined> {
     const result = await this.db
       .select()
       .from(exportOrderMotorcycles)
@@ -45,7 +45,7 @@ export class ExportOrderMotorcycleRepository {
     return result[0];
   }
 
-  async delete(id: number): Promise<ExportOrderMotorcycle | undefined> {
+  async delete(id: string): Promise<ExportOrderMotorcycle | undefined> {
     const result = await this.db
       .delete(exportOrderMotorcycles)
       .where(eq(exportOrderMotorcycles.id, id))

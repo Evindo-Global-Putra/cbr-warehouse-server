@@ -60,7 +60,7 @@ export const exportOrderMotorcycleRoutes = new Elysia({
       );
       return { success: true, data };
     },
-    { params: t.Object({ exportOrderId: t.Numeric() }) },
+    { params: t.Object({ exportOrderId: t.String() }) },
   )
   // ─── GET /export-order-motorcycles/:id ────────────────────────────────────
   .get(
@@ -69,7 +69,7 @@ export const exportOrderMotorcycleRoutes = new Elysia({
       const data = await exportOrderMotorcycleService.getById(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) },
+    { params: t.Object({ id: t.String() }) },
   )
   // ─── POST /export-order-motorcycles ───────────────────────────────────────
   // Assign a motorcycle (on_site) to an export order → status becomes 'loading'
@@ -86,8 +86,8 @@ export const exportOrderMotorcycleRoutes = new Elysia({
     },
     {
       body: t.Object({
-        exportOrderId: t.Number(),
-        motorcycleId: t.Number(),
+        exportOrderId: t.String(),
+        motorcycleId: t.String(),
       }),
     },
   )
@@ -100,5 +100,5 @@ export const exportOrderMotorcycleRoutes = new Elysia({
       const data = await exportOrderMotorcycleService.unassign(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) },
+    { params: t.Object({ id: t.String() }) },
   );

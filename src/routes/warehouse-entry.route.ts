@@ -67,8 +67,8 @@ export const warehouseEntryRoutes = new Elysia({
         status: t.Optional(
           t.Union([t.Literal("in_progress"), t.Literal("completed")])
         ),
-        branchId: t.Optional(t.Numeric()),
-        travelPermitId: t.Optional(t.Numeric()),
+        branchId: t.Optional(t.String()),
+        travelPermitId: t.Optional(t.String()),
       }),
     },
   )
@@ -93,7 +93,7 @@ export const warehouseEntryRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ branchId: t.Numeric() }),
+      params: t.Object({ branchId: t.String() }),
     },
   )
   // ─── GET /warehouse-entries/travel-permit/:travelPermitId ─────────────────
@@ -106,7 +106,7 @@ export const warehouseEntryRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ travelPermitId: t.Numeric() }),
+      params: t.Object({ travelPermitId: t.String() }),
     },
   )
   // ─── GET /warehouse-entries/:id ───────────────────────────────────────────
@@ -117,7 +117,7 @@ export const warehouseEntryRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
     },
   )
   // ─── POST /warehouse-entries ──────────────────────────────────────────────
@@ -131,10 +131,10 @@ export const warehouseEntryRoutes = new Elysia({
     },
     {
       body: t.Object({
-        travelPermitId: t.Number(),
-        branchId: t.Number(),
+        travelPermitId: t.String(),
+        branchId: t.String(),
         totalUnitsExpected: t.Number({ minimum: 1 }),
-        createdById: t.Optional(t.Number()),
+        createdById: t.Optional(t.String()),
       }),
     },
   )
@@ -149,7 +149,7 @@ export const warehouseEntryRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
     },
   )
   // ─── PATCH /warehouse-entries/:id/complete ────────────────────────────────
@@ -162,7 +162,7 @@ export const warehouseEntryRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
     },
   )
   // ─── PUT /warehouse-entries/:id ───────────────────────────────────────────
@@ -174,12 +174,12 @@ export const warehouseEntryRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
       body: t.Object({
-        travelPermitId: t.Optional(t.Number()),
-        branchId: t.Optional(t.Number()),
+        travelPermitId: t.Optional(t.String()),
+        branchId: t.Optional(t.String()),
         totalUnitsExpected: t.Optional(t.Number({ minimum: 1 })),
-        createdById: t.Optional(t.Number()),
+        createdById: t.Optional(t.String()),
       }),
     },
   )
@@ -193,6 +193,6 @@ export const warehouseEntryRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
     },
   );

@@ -15,7 +15,7 @@ export class ShipmentRepository {
     return this.db.select().from(shipments);
   }
 
-  async findById(id: number): Promise<Shipment | undefined> {
+  async findById(id: string): Promise<Shipment | undefined> {
     const result = await this.db
       .select()
       .from(shipments)
@@ -23,7 +23,7 @@ export class ShipmentRepository {
     return result[0];
   }
 
-  async findByLoadingForm(loadingFormId: number): Promise<Shipment[]> {
+  async findByLoadingForm(loadingFormId: string): Promise<Shipment[]> {
     return this.db
       .select()
       .from(shipments)
@@ -50,7 +50,7 @@ export class ShipmentRepository {
     return result[0];
   }
 
-  async update(id: number, data: UpdateShipment): Promise<Shipment | undefined> {
+  async update(id: string, data: UpdateShipment): Promise<Shipment | undefined> {
     const result = await this.db
       .update(shipments)
       .set({ ...data, updatedAt: new Date() })
@@ -59,7 +59,7 @@ export class ShipmentRepository {
     return result[0];
   }
 
-  async delete(id: number): Promise<Shipment | undefined> {
+  async delete(id: string): Promise<Shipment | undefined> {
     const result = await this.db
       .delete(shipments)
       .where(eq(shipments.id, id))

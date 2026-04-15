@@ -13,15 +13,15 @@ export class WarehouseTransferMotorcycleService {
     private motorcycleRepo: MotorcycleRepository
   ) {}
 
-  async getByTransfer(transferId: number): Promise<WTM[]> {
+  async getByTransfer(transferId: string): Promise<WTM[]> {
     return this.repo.findByTransfer(transferId);
   }
 
-  async getByMotorcycle(motorcycleId: number): Promise<WTM[]> {
+  async getByMotorcycle(motorcycleId: string): Promise<WTM[]> {
     return this.repo.findByMotorcycle(motorcycleId);
   }
 
-  async getById(id: number): Promise<WTM> {
+  async getById(id: string): Promise<WTM> {
     const item = await this.repo.findById(id);
     if (!item) throw new Error(`Transfer motorcycle record with id ${id} not found`);
     return item;
@@ -56,7 +56,7 @@ export class WarehouseTransferMotorcycleService {
     return this.repo.create(data);
   }
 
-  async removeMotorcycle(transferId: number, motorcycleId: number): Promise<WTM> {
+  async removeMotorcycle(transferId: string, motorcycleId: string): Promise<WTM> {
     const transfer = await this.transferRepo.findById(transferId);
     if (!transfer) {
       throw new Error(`Warehouse transfer with id ${transferId} not found`);
@@ -76,7 +76,7 @@ export class WarehouseTransferMotorcycleService {
     return deleted;
   }
 
-  async delete(id: number): Promise<WTM> {
+  async delete(id: string): Promise<WTM> {
     const item = await this.getById(id);
     const transfer = await this.transferRepo.findById(item.transferId);
     if (transfer?.status !== "pending") {

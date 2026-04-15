@@ -16,19 +16,19 @@ export class ExportOrderMotorcycleService {
     return this.repo.findAll();
   }
 
-  async getById(id: number): Promise<ExportOrderMotorcycle> {
+  async getById(id: string): Promise<ExportOrderMotorcycle> {
     const item = await this.repo.findById(id);
     if (!item) throw new Error(`Export order motorcycle assignment with id ${id} not found`);
     return item;
   }
 
-  async getByExportOrder(exportOrderId: number): Promise<ExportOrderMotorcycle[]> {
+  async getByExportOrder(exportOrderId: string): Promise<ExportOrderMotorcycle[]> {
     return this.repo.findByExportOrder(exportOrderId);
   }
 
   // Assign a motorcycle unit to an export order.
   // Validates the order is in an assignable state and the motorcycle is on_site.
-  async assign(exportOrderId: number, motorcycleId: number): Promise<ExportOrderMotorcycle> {
+  async assign(exportOrderId: string, motorcycleId: string): Promise<ExportOrderMotorcycle> {
     const order = await this.exportOrderRepo.findById(exportOrderId);
     if (!order) throw new Error(`Export order with id ${exportOrderId} not found`);
     if (!["pending", "confirmed", "in_progress"].includes(order.status)) {
@@ -59,7 +59,7 @@ export class ExportOrderMotorcycleService {
   }
 
   // Remove a motorcycle assignment and revert its status back to on_site.
-  async unassign(id: number): Promise<ExportOrderMotorcycle> {
+  async unassign(id: string): Promise<ExportOrderMotorcycle> {
     const assignment = await this.getById(id);
 
     // Revert motorcycle status

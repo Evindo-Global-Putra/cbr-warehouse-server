@@ -15,7 +15,7 @@ export class InvoiceRepository {
     return this.db.select().from(invoices);
   }
 
-  async findById(id: number): Promise<Invoice | undefined> {
+  async findById(id: string): Promise<Invoice | undefined> {
     const result = await this.db
       .select()
       .from(invoices)
@@ -31,14 +31,14 @@ export class InvoiceRepository {
     return result[0];
   }
 
-  async findByExportOrder(exportOrderId: number): Promise<Invoice[]> {
+  async findByExportOrder(exportOrderId: string): Promise<Invoice[]> {
     return this.db
       .select()
       .from(invoices)
       .where(eq(invoices.exportOrderId, exportOrderId));
   }
 
-  async findByClient(clientId: number): Promise<Invoice[]> {
+  async findByClient(clientId: string): Promise<Invoice[]> {
     return this.db
       .select()
       .from(invoices)
@@ -57,7 +57,7 @@ export class InvoiceRepository {
     return result[0];
   }
 
-  async update(id: number, data: UpdateInvoice): Promise<Invoice | undefined> {
+  async update(id: string, data: UpdateInvoice): Promise<Invoice | undefined> {
     const result = await this.db
       .update(invoices)
       .set({ ...data, updatedAt: new Date() })
@@ -66,7 +66,7 @@ export class InvoiceRepository {
     return result[0];
   }
 
-  async delete(id: number): Promise<Invoice | undefined> {
+  async delete(id: string): Promise<Invoice | undefined> {
     const result = await this.db
       .delete(invoices)
       .where(eq(invoices.id, id))

@@ -14,7 +14,7 @@ export class WarehouseTransferMotorcycleRepository {
     return this.db.select().from(warehouseTransferMotorcycles);
   }
 
-  async findById(id: number): Promise<WTM | undefined> {
+  async findById(id: string): Promise<WTM | undefined> {
     const result = await this.db
       .select()
       .from(warehouseTransferMotorcycles)
@@ -22,14 +22,14 @@ export class WarehouseTransferMotorcycleRepository {
     return result[0];
   }
 
-  async findByTransfer(transferId: number): Promise<WTM[]> {
+  async findByTransfer(transferId: string): Promise<WTM[]> {
     return this.db
       .select()
       .from(warehouseTransferMotorcycles)
       .where(eq(warehouseTransferMotorcycles.transferId, transferId));
   }
 
-  async findByMotorcycle(motorcycleId: number): Promise<WTM[]> {
+  async findByMotorcycle(motorcycleId: string): Promise<WTM[]> {
     return this.db
       .select()
       .from(warehouseTransferMotorcycles)
@@ -44,7 +44,7 @@ export class WarehouseTransferMotorcycleRepository {
     return result[0];
   }
 
-  async delete(id: number): Promise<WTM | undefined> {
+  async delete(id: string): Promise<WTM | undefined> {
     const result = await this.db
       .delete(warehouseTransferMotorcycles)
       .where(eq(warehouseTransferMotorcycles.id, id))
@@ -53,8 +53,8 @@ export class WarehouseTransferMotorcycleRepository {
   }
 
   async deleteByTransferAndMotorcycle(
-    transferId: number,
-    motorcycleId: number
+    transferId: string,
+    motorcycleId: string
   ): Promise<WTM | undefined> {
     const result = await this.db
       .delete(warehouseTransferMotorcycles)

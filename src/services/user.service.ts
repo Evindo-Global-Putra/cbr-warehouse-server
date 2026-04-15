@@ -12,7 +12,7 @@ export class UserService {
     return this.userRepo.findAll();
   }
 
-  async getById(id: number): Promise<User> {
+  async getById(id: string): Promise<User> {
     const user = await this.userRepo.findById(id);
     if (!user) throw new Error(`User with id ${id} not found`);
     return user;
@@ -28,7 +28,7 @@ export class UserService {
     return this.userRepo.findByRole(role);
   }
 
-  async getByBranch(branchId: number): Promise<User[]> {
+  async getByBranch(branchId: string): Promise<User[]> {
     return this.userRepo.findByBranch(branchId);
   }
 
@@ -38,7 +38,7 @@ export class UserService {
     return this.userRepo.create(data);
   }
 
-  async update(id: number, data: UpdateUser): Promise<User> {
+  async update(id: string, data: UpdateUser): Promise<User> {
     await this.getById(id);
 
     if (data.email) {
@@ -53,19 +53,19 @@ export class UserService {
     return updated;
   }
 
-  async logout(id: number): Promise<void> {
+  async logout(id: string): Promise<void> {
     await this.getById(id);
     await this.userRepo.incrementTokenVersion(id);
   }
 
-  async deactivate(id: number): Promise<User> {
+  async deactivate(id: string): Promise<User> {
     await this.getById(id);
     const updated = await this.userRepo.deactivate(id);
     if (!updated) throw new Error(`Failed to deactivate user with id ${id}`);
     return updated;
   }
 
-  async delete(id: number): Promise<User> {
+  async delete(id: string): Promise<User> {
     await this.getById(id);
     const deleted = await this.userRepo.delete(id);
     if (!deleted) throw new Error(`Failed to delete user with id ${id}`);

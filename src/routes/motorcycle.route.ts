@@ -76,8 +76,8 @@ export const motorcycleRoutes = new Elysia({
             t.Literal("transferred"),
           ])
         ),
-        branchId: t.Optional(t.Numeric()),
-        typeId: t.Optional(t.Numeric()),
+        branchId: t.Optional(t.String()),
+        typeId: t.Optional(t.String()),
         color: t.Optional(t.String()),
         search: t.Optional(t.String()),
       }),
@@ -109,7 +109,7 @@ export const motorcycleRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ branchId: t.Numeric() }),
+      params: t.Object({ branchId: t.String() }),
     },
   )
   // ─── GET /motorcycles/entry/:entryId ──────────────────────────────────────
@@ -120,7 +120,7 @@ export const motorcycleRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ entryId: t.Numeric() }),
+      params: t.Object({ entryId: t.String() }),
     },
   )
   // ─── GET /motorcycles/type/:typeId ────────────────────────────────────────
@@ -131,7 +131,7 @@ export const motorcycleRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ typeId: t.Numeric() }),
+      params: t.Object({ typeId: t.String() }),
     },
   )
   // ─── GET /motorcycles/frame/:frameNumber ──────────────────────────────────
@@ -177,7 +177,7 @@ export const motorcycleRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
     },
   )
   // ─── POST /motorcycles/scan ───────────────────────────────────────────────
@@ -202,12 +202,12 @@ export const motorcycleRoutes = new Elysia({
     },
     {
       body: t.Object({
-        typeId: t.Number(),
+        typeId: t.String(),
         color: t.String({ minLength: 1 }),
         frameNumber: t.String({ minLength: 1 }),
         engineNumber: t.String({ minLength: 1 }),
-        branchId: t.Number(),
-        entryId: t.Optional(t.Number()),
+        branchId: t.String(),
+        entryId: t.Optional(t.String()),
         frontPhotoUrl: t.Optional(t.String()),
         framePhotoUrl: t.Optional(t.String()),
         enginePhotoUrl: t.Optional(t.String()),
@@ -225,7 +225,7 @@ export const motorcycleRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
       body: t.Object({
         status: t.Union([
           t.Literal("on_site"),
@@ -245,13 +245,13 @@ export const motorcycleRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
       body: t.Object({
-        typeId: t.Optional(t.Number()),
+        typeId: t.Optional(t.String()),
         color: t.Optional(t.String({ minLength: 1 })),
         frameNumber: t.Optional(t.String({ minLength: 1 })),
         engineNumber: t.Optional(t.String({ minLength: 1 })),
-        branchId: t.Optional(t.Number()),
+        branchId: t.Optional(t.String()),
         frontPhotoUrl: t.Optional(t.String()),
         framePhotoUrl: t.Optional(t.String()),
         enginePhotoUrl: t.Optional(t.String()),
@@ -269,6 +269,6 @@ export const motorcycleRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
     },
   );

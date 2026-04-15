@@ -15,13 +15,13 @@ export class PaymentService {
     return this.repo.findAll();
   }
 
-  async getById(id: number): Promise<Payment> {
+  async getById(id: string): Promise<Payment> {
     const payment = await this.repo.findById(id);
     if (!payment) throw new Error(`Payment with id ${id} not found`);
     return payment;
   }
 
-  async getByInvoice(invoiceId: number): Promise<Payment[]> {
+  async getByInvoice(invoiceId: string): Promise<Payment[]> {
     return this.repo.findByInvoice(invoiceId);
   }
 
@@ -55,7 +55,7 @@ export class PaymentService {
     return payment;
   }
 
-  async delete(id: number): Promise<Payment> {
+  async delete(id: string): Promise<Payment> {
     const payment = await this.getById(id);
     const invoice = await this.invoiceRepo.findById(payment.invoiceId);
     if (invoice?.status === "paid") {

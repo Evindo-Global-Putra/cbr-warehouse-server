@@ -56,7 +56,7 @@ export const exportOrderItemRoutes = new Elysia({
       const data = await exportOrderItemService.getByExportOrder(params.exportOrderId);
       return { success: true, data };
     },
-    { params: t.Object({ exportOrderId: t.Numeric() }) },
+    { params: t.Object({ exportOrderId: t.String() }) },
   )
   // ─── GET /export-order-items/:id ──────────────────────────────────────────
   .get(
@@ -65,7 +65,7 @@ export const exportOrderItemRoutes = new Elysia({
       const data = await exportOrderItemService.getById(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) },
+    { params: t.Object({ id: t.String() }) },
   )
   // ─── POST /export-order-items ─────────────────────────────────────────────
   .post(
@@ -78,9 +78,9 @@ export const exportOrderItemRoutes = new Elysia({
     },
     {
       body: t.Object({
-        exportOrderId: t.Number(),
-        motorcycleTypeId: t.Optional(t.Number()),
-        accessoryId: t.Optional(t.Number()),
+        exportOrderId: t.String(),
+        motorcycleTypeId: t.Optional(t.String()),
+        accessoryId: t.Optional(t.String()),
         quantityRequested: t.Number({ minimum: 1 }),
         quantityAssigned: t.Optional(t.Number({ minimum: 0 })),
         unitPrice: t.Optional(t.String()),
@@ -97,7 +97,7 @@ export const exportOrderItemRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
       body: t.Object({
         quantityRequested: t.Optional(t.Number({ minimum: 1 })),
         quantityAssigned: t.Optional(t.Number({ minimum: 0 })),
@@ -114,5 +114,5 @@ export const exportOrderItemRoutes = new Elysia({
       const data = await exportOrderItemService.delete(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) },
+    { params: t.Object({ id: t.String() }) },
   );

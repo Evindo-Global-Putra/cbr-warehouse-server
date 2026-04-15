@@ -16,13 +16,13 @@ export class PackingListService {
     return this.repo.findAll();
   }
 
-  async getById(id: number): Promise<PackingList> {
+  async getById(id: string): Promise<PackingList> {
     const pl = await this.repo.findById(id);
     if (!pl) throw new Error(`Packing list with id ${id} not found`);
     return pl;
   }
 
-  async getByInvoice(invoiceId: number): Promise<PackingList> {
+  async getByInvoice(invoiceId: string): Promise<PackingList> {
     const pl = await this.repo.findByInvoice(invoiceId);
     if (!pl)
       throw new Error(`Packing list for invoice id ${invoiceId} not found`);
@@ -43,14 +43,14 @@ export class PackingListService {
     return this.repo.create(data);
   }
 
-  async update(id: number, data: UpdatePackingList): Promise<PackingList> {
+  async update(id: string, data: UpdatePackingList): Promise<PackingList> {
     await this.getById(id);
     const updated = await this.repo.update(id, data);
     if (!updated) throw new Error(`Failed to update packing list with id ${id}`);
     return updated;
   }
 
-  async delete(id: number): Promise<PackingList> {
+  async delete(id: string): Promise<PackingList> {
     await this.getById(id);
     const deleted = await this.repo.delete(id);
     if (!deleted) throw new Error(`Failed to delete packing list with id ${id}`);

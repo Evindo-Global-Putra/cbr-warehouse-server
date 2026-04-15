@@ -15,7 +15,7 @@ export class BranchRepository {
     return this.db.select().from(branches);
   }
 
-  async findById(id: number): Promise<Branch | undefined> {
+  async findById(id: string): Promise<Branch | undefined> {
     const result = await this.db
       .select()
       .from(branches)
@@ -36,7 +36,7 @@ export class BranchRepository {
     return result[0];
   }
 
-  async update(id: number, data: UpdateBranch): Promise<Branch | undefined> {
+  async update(id: string, data: UpdateBranch): Promise<Branch | undefined> {
     const result = await this.db
       .update(branches)
       .set({ ...data, updatedAt: new Date() })
@@ -45,7 +45,7 @@ export class BranchRepository {
     return result[0];
   }
 
-  async delete(id: number): Promise<Branch | undefined> {
+  async delete(id: string): Promise<Branch | undefined> {
     const result = await this.db
       .delete(branches)
       .where(eq(branches.id, id))

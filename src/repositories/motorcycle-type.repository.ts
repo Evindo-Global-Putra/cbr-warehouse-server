@@ -47,7 +47,7 @@ export class MotorcycleTypeRepository {
     return { data, total: Number(total) };
   }
 
-  async findById(id: number): Promise<MotorcycleType | undefined> {
+  async findById(id: string): Promise<MotorcycleType | undefined> {
     const result = await this.db
       .select()
       .from(motorcycleTypes)
@@ -91,7 +91,7 @@ export class MotorcycleTypeRepository {
   }
 
   async update(
-    id: number,
+    id: string,
     data: UpdateMotorcycleType
   ): Promise<MotorcycleType | undefined> {
     const result = await this.db
@@ -102,7 +102,7 @@ export class MotorcycleTypeRepository {
     return result[0];
   }
 
-  async delete(id: number): Promise<MotorcycleType | undefined> {
+  async delete(id: string): Promise<MotorcycleType | undefined> {
     const result = await this.db
       .delete(motorcycleTypes)
       .where(eq(motorcycleTypes.id, id))

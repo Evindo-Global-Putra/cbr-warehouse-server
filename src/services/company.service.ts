@@ -12,7 +12,7 @@ export class CompanyService {
     return this.companyRepo.findAll();
   }
 
-  async getById(id: number): Promise<Company> {
+  async getById(id: string): Promise<Company> {
     const company = await this.companyRepo.findById(id);
     if (!company) throw new Error(`Company with id ${id} not found`);
     return company;
@@ -40,7 +40,7 @@ export class CompanyService {
     return this.companyRepo.create(data);
   }
 
-  async update(id: number, data: UpdateCompany): Promise<Company> {
+  async update(id: string, data: UpdateCompany): Promise<Company> {
     await this.getById(id);
 
     if (data.npwp) {
@@ -55,7 +55,7 @@ export class CompanyService {
     return updated;
   }
 
-  async delete(id: number): Promise<Company> {
+  async delete(id: string): Promise<Company> {
     await this.getById(id);
     const deleted = await this.companyRepo.delete(id);
     if (!deleted) throw new Error(`Failed to delete company with id ${id}`);

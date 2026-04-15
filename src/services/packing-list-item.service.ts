@@ -14,7 +14,7 @@ export class PackingListItemService {
 
   // Recompute and persist totalQuantity, totalGrossWeight, totalNetWeight
   // on the parent packing list after any item mutation.
-  private async recalculateTotals(packingListId: number): Promise<void> {
+  private async recalculateTotals(packingListId: string): Promise<void> {
     const items = await this.repo.findByPackingList(packingListId);
     const totalQuantity = items.reduce((sum, i) => sum + i.quantity, 0);
     const totalGrossWeight = items
@@ -34,13 +34,13 @@ export class PackingListItemService {
     return this.repo.findAll();
   }
 
-  async getById(id: number): Promise<PackingListItem> {
+  async getById(id: string): Promise<PackingListItem> {
     const item = await this.repo.findById(id);
     if (!item) throw new Error(`Packing list item with id ${id} not found`);
     return item;
   }
 
-  async getByPackingList(packingListId: number): Promise<PackingListItem[]> {
+  async getByPackingList(packingListId: string): Promise<PackingListItem[]> {
     return this.repo.findByPackingList(packingListId);
   }
 
@@ -55,7 +55,7 @@ export class PackingListItemService {
   }
 
   async update(
-    id: number,
+    id: string,
     data: UpdatePackingListItem
   ): Promise<PackingListItem> {
     const item = await this.getById(id);
@@ -66,7 +66,7 @@ export class PackingListItemService {
     return updated;
   }
 
-  async delete(id: number): Promise<PackingListItem> {
+  async delete(id: string): Promise<PackingListItem> {
     const item = await this.getById(id);
     const deleted = await this.repo.delete(id);
     if (!deleted)

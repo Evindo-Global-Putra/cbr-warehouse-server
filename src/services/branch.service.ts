@@ -12,7 +12,7 @@ export class BranchService {
     return this.branchRepo.findAll();
   }
 
-  async getById(id: number): Promise<Branch> {
+  async getById(id: string): Promise<Branch> {
     const branch = await this.branchRepo.findById(id);
     if (!branch) throw new Error(`Branch with id ${id} not found`);
     return branch;
@@ -30,7 +30,7 @@ export class BranchService {
     return this.branchRepo.create(data);
   }
 
-  async update(id: number, data: UpdateBranch): Promise<Branch> {
+  async update(id: string, data: UpdateBranch): Promise<Branch> {
     await this.getById(id);
 
     if (data.code) {
@@ -45,7 +45,7 @@ export class BranchService {
     return updated;
   }
 
-  async delete(id: number): Promise<Branch> {
+  async delete(id: string): Promise<Branch> {
     await this.getById(id);
     const deleted = await this.branchRepo.delete(id);
     if (!deleted) throw new Error(`Failed to delete branch with id ${id}`);

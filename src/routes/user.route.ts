@@ -59,7 +59,7 @@ export const userRoutes = new Elysia({
       return { success: true, data: safeUser(user as Record<string, unknown>) };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
     },
   )
   // ─── PUT /users/:id ───────────────────────────────────────────────────────
@@ -71,7 +71,7 @@ export const userRoutes = new Elysia({
       return { success: true, data: safeUser(user as Record<string, unknown>) };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
       body: t.Object({
         name: t.Optional(t.String({ minLength: 1 })),
         email: t.Optional(t.String({ format: "email" })),
@@ -83,7 +83,7 @@ export const userRoutes = new Elysia({
             t.Literal("finance"),
           ]),
         ),
-        branchId: t.Optional(t.Nullable(t.Number())),
+        branchId: t.Optional(t.Nullable(t.String())),
         isActive: t.Optional(t.Boolean()),
       }),
     },
@@ -97,6 +97,6 @@ export const userRoutes = new Elysia({
       return { success: true, data: safeUser(user as Record<string, unknown>) };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
     },
   );

@@ -85,7 +85,7 @@ export const companyRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
     },
   )
   // ─── POST /companies ──────────────────────────────────────────────────────
@@ -119,7 +119,7 @@ export const companyRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
       body: t.Object({
         name: t.Optional(t.String({ minLength: 1 })),
         country: t.Optional(t.String({ minLength: 1 })),
@@ -141,6 +141,6 @@ export const companyRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
     },
   );

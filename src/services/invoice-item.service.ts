@@ -19,13 +19,13 @@ export class InvoiceItemService {
     return this.repo.findAll();
   }
 
-  async getById(id: number): Promise<InvoiceItem> {
+  async getById(id: string): Promise<InvoiceItem> {
     const item = await this.repo.findById(id);
     if (!item) throw new Error(`Invoice item with id ${id} not found`);
     return item;
   }
 
-  async getByInvoice(invoiceId: number): Promise<InvoiceItem[]> {
+  async getByInvoice(invoiceId: string): Promise<InvoiceItem[]> {
     return this.repo.findByInvoice(invoiceId);
   }
 
@@ -44,7 +44,7 @@ export class InvoiceItemService {
     return this.repo.create({ ...data, amount });
   }
 
-  async update(id: number, data: UpdateInvoiceItem): Promise<InvoiceItem> {
+  async update(id: string, data: UpdateInvoiceItem): Promise<InvoiceItem> {
     const item = await this.getById(id);
     const invoice = await this.invoiceRepo.findById(item.invoiceId);
     if (!invoice || invoice.status !== "draft") {
@@ -64,7 +64,7 @@ export class InvoiceItemService {
     return updated;
   }
 
-  async delete(id: number): Promise<InvoiceItem> {
+  async delete(id: string): Promise<InvoiceItem> {
     const item = await this.getById(id);
     const invoice = await this.invoiceRepo.findById(item.invoiceId);
     if (!invoice || invoice.status !== "draft") {

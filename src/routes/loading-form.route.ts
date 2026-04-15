@@ -74,7 +74,7 @@ export const loadingFormRoutes = new Elysia({
       const data = await loadingFormService.getByBranch(params.branchId);
       return { success: true, data };
     },
-    { params: t.Object({ branchId: t.Numeric() }) },
+    { params: t.Object({ branchId: t.String() }) },
   )
   // ─── GET /loading-forms/order/:exportOrderId ──────────────────────────────
   .get(
@@ -83,7 +83,7 @@ export const loadingFormRoutes = new Elysia({
       const data = await loadingFormService.getByExportOrder(params.exportOrderId);
       return { success: true, data };
     },
-    { params: t.Object({ exportOrderId: t.Numeric() }) },
+    { params: t.Object({ exportOrderId: t.String() }) },
   )
   // ─── GET /loading-forms/:id ───────────────────────────────────────────────
   .get(
@@ -92,7 +92,7 @@ export const loadingFormRoutes = new Elysia({
       const data = await loadingFormService.getById(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) },
+    { params: t.Object({ id: t.String() }) },
   )
   // ─── POST /loading-forms ──────────────────────────────────────────────────
   .post(
@@ -105,10 +105,10 @@ export const loadingFormRoutes = new Elysia({
     },
     {
       body: t.Object({
-        exportOrderId: t.Number(),
-        branchId: t.Number(),
+        exportOrderId: t.String(),
+        branchId: t.String(),
         truckPoliceNumber: t.Optional(t.String()),
-        createdById: t.Optional(t.Number()),
+        createdById: t.Optional(t.String()),
       }),
     },
   )
@@ -121,7 +121,7 @@ export const loadingFormRoutes = new Elysia({
       const data = await loadingFormService.confirm(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) },
+    { params: t.Object({ id: t.String() }) },
   )
   // ─── PATCH /loading-forms/:id/validate ───────────────────────────────────
   // Advance status: confirmed → validated; also sets export order to 'loading'
@@ -133,8 +133,8 @@ export const loadingFormRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
-      body: t.Object({ validatedById: t.Number() }),
+      params: t.Object({ id: t.String() }),
+      body: t.Object({ validatedById: t.String() }),
     },
   )
   // ─── PUT /loading-forms/:id ───────────────────────────────────────────────
@@ -147,12 +147,12 @@ export const loadingFormRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
       body: t.Object({
-        exportOrderId: t.Optional(t.Number()),
-        branchId: t.Optional(t.Number()),
+        exportOrderId: t.Optional(t.String()),
+        branchId: t.Optional(t.String()),
         truckPoliceNumber: t.Optional(t.String()),
-        createdById: t.Optional(t.Number()),
+        createdById: t.Optional(t.String()),
       }),
     },
   )
@@ -165,5 +165,5 @@ export const loadingFormRoutes = new Elysia({
       const data = await loadingFormService.delete(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) },
+    { params: t.Object({ id: t.String() }) },
   );

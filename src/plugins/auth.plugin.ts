@@ -22,7 +22,7 @@ export const authPlugin = new Elysia({ name: "auth-plugin" })
     if (!payload) throw new Error("Unauthorized");
 
     // Fetch user from DB to validate isActive and tokenVersion
-    const user = await userRepo.findById(Number(payload.sub));
+    const user = await userRepo.findById(payload.sub as string);
     if (!user || !user.isActive) throw new Error("Unauthorized");
     if (user.tokenVersion !== Number(payload.tokenVersion)) throw new Error("Unauthorized");
 

@@ -16,7 +16,7 @@ export class InvoiceService {
     return this.repo.findAll();
   }
 
-  async getById(id: number): Promise<Invoice> {
+  async getById(id: string): Promise<Invoice> {
     const invoice = await this.repo.findById(id);
     if (!invoice) throw new Error(`Invoice with id ${id} not found`);
     return invoice;
@@ -28,11 +28,11 @@ export class InvoiceService {
     return invoice;
   }
 
-  async getByExportOrder(exportOrderId: number): Promise<Invoice[]> {
+  async getByExportOrder(exportOrderId: string): Promise<Invoice[]> {
     return this.repo.findByExportOrder(exportOrderId);
   }
 
-  async getByClient(clientId: number): Promise<Invoice[]> {
+  async getByClient(clientId: string): Promise<Invoice[]> {
     return this.repo.findByClient(clientId);
   }
 
@@ -48,7 +48,7 @@ export class InvoiceService {
     return this.repo.create(data);
   }
 
-  async send(id: number): Promise<Invoice> {
+  async send(id: string): Promise<Invoice> {
     const invoice = await this.getById(id);
     if (invoice.status !== "draft") {
       throw new Error(
@@ -63,7 +63,7 @@ export class InvoiceService {
     return updated;
   }
 
-  async markPaid(id: number): Promise<Invoice> {
+  async markPaid(id: string): Promise<Invoice> {
     const invoice = await this.getById(id);
     if (invoice.status !== "sent" && invoice.status !== "overdue") {
       throw new Error(
@@ -75,7 +75,7 @@ export class InvoiceService {
     return updated;
   }
 
-  async markOverdue(id: number): Promise<Invoice> {
+  async markOverdue(id: string): Promise<Invoice> {
     const invoice = await this.getById(id);
     if (invoice.status !== "sent") {
       throw new Error(
@@ -87,7 +87,7 @@ export class InvoiceService {
     return updated;
   }
 
-  async cancel(id: number): Promise<Invoice> {
+  async cancel(id: string): Promise<Invoice> {
     const invoice = await this.getById(id);
     if (invoice.status === "paid" || invoice.status === "cancelled") {
       throw new Error(
@@ -99,7 +99,7 @@ export class InvoiceService {
     return updated;
   }
 
-  async update(id: number, data: UpdateInvoice): Promise<Invoice> {
+  async update(id: string, data: UpdateInvoice): Promise<Invoice> {
     const invoice = await this.getById(id);
     if (invoice.status !== "draft") {
       throw new Error(`Only draft invoices can be updated`);
@@ -109,7 +109,7 @@ export class InvoiceService {
     return updated;
   }
 
-  async delete(id: number): Promise<Invoice> {
+  async delete(id: string): Promise<Invoice> {
     const invoice = await this.getById(id);
     if (invoice.status !== "draft") {
       throw new Error(

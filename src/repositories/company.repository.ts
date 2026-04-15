@@ -15,7 +15,7 @@ export class CompanyRepository {
     return this.db.select().from(companies);
   }
 
-  async findById(id: number): Promise<Company | undefined> {
+  async findById(id: string): Promise<Company | undefined> {
     const result = await this.db
       .select()
       .from(companies)
@@ -50,7 +50,7 @@ export class CompanyRepository {
     return result[0];
   }
 
-  async update(id: number, data: UpdateCompany): Promise<Company | undefined> {
+  async update(id: string, data: UpdateCompany): Promise<Company | undefined> {
     const result = await this.db
       .update(companies)
       .set({ ...data, updatedAt: new Date() })
@@ -59,7 +59,7 @@ export class CompanyRepository {
     return result[0];
   }
 
-  async delete(id: number): Promise<Company | undefined> {
+  async delete(id: string): Promise<Company | undefined> {
     const result = await this.db
       .delete(companies)
       .where(eq(companies.id, id))

@@ -15,7 +15,7 @@ export class SupplierRepository {
     return this.db.select().from(suppliers);
   }
 
-  async findById(id: number): Promise<Supplier | undefined> {
+  async findById(id: string): Promise<Supplier | undefined> {
     const result = await this.db
       .select()
       .from(suppliers)
@@ -42,7 +42,7 @@ export class SupplierRepository {
     return result[0];
   }
 
-  async update(id: number, data: UpdateSupplier): Promise<Supplier | undefined> {
+  async update(id: string, data: UpdateSupplier): Promise<Supplier | undefined> {
     const result = await this.db
       .update(suppliers)
       .set({ ...data, updatedAt: new Date() })
@@ -51,7 +51,7 @@ export class SupplierRepository {
     return result[0];
   }
 
-  async delete(id: number): Promise<Supplier | undefined> {
+  async delete(id: string): Promise<Supplier | undefined> {
     const result = await this.db
       .delete(suppliers)
       .where(eq(suppliers.id, id))

@@ -15,7 +15,7 @@ export class UserRepository {
     return this.db.select().from(users);
   }
 
-  async findById(id: number): Promise<User | undefined> {
+  async findById(id: string): Promise<User | undefined> {
     const result = await this.db
       .select()
       .from(users)
@@ -35,7 +35,7 @@ export class UserRepository {
     return this.db.select().from(users).where(eq(users.role, role));
   }
 
-  async findByBranch(branchId: number): Promise<User[]> {
+  async findByBranch(branchId: string): Promise<User[]> {
     return this.db
       .select()
       .from(users)
@@ -47,7 +47,7 @@ export class UserRepository {
     return result[0];
   }
 
-  async update(id: number, data: UpdateUser): Promise<User | undefined> {
+  async update(id: string, data: UpdateUser): Promise<User | undefined> {
     const result = await this.db
       .update(users)
       .set({ ...data, updatedAt: new Date() })
@@ -56,7 +56,7 @@ export class UserRepository {
     return result[0];
   }
 
-  async incrementTokenVersion(id: number): Promise<User | undefined> {
+  async incrementTokenVersion(id: string): Promise<User | undefined> {
     const result = await this.db
       .update(users)
       .set({
@@ -68,11 +68,11 @@ export class UserRepository {
     return result[0];
   }
 
-  async deactivate(id: number): Promise<User | undefined> {
+  async deactivate(id: string): Promise<User | undefined> {
     return this.update(id, { isActive: false });
   }
 
-  async delete(id: number): Promise<User | undefined> {
+  async delete(id: string): Promise<User | undefined> {
     const result = await this.db
       .delete(users)
       .where(eq(users.id, id))

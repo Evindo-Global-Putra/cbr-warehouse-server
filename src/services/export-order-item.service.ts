@@ -16,13 +16,13 @@ export class ExportOrderItemService {
     return this.repo.findAll();
   }
 
-  async getById(id: number): Promise<ExportOrderItem> {
+  async getById(id: string): Promise<ExportOrderItem> {
     const item = await this.repo.findById(id);
     if (!item) throw new Error(`Export order item with id ${id} not found`);
     return item;
   }
 
-  async getByExportOrder(exportOrderId: number): Promise<ExportOrderItem[]> {
+  async getByExportOrder(exportOrderId: string): Promise<ExportOrderItem[]> {
     return this.repo.findByExportOrder(exportOrderId);
   }
 
@@ -47,14 +47,14 @@ export class ExportOrderItemService {
     return this.repo.create(data);
   }
 
-  async update(id: number, data: UpdateExportOrderItem): Promise<ExportOrderItem> {
+  async update(id: string, data: UpdateExportOrderItem): Promise<ExportOrderItem> {
     await this.getById(id);
     const updated = await this.repo.update(id, data);
     if (!updated) throw new Error(`Failed to update export order item with id ${id}`);
     return updated;
   }
 
-  async delete(id: number): Promise<ExportOrderItem> {
+  async delete(id: string): Promise<ExportOrderItem> {
     await this.getById(id);
     const deleted = await this.repo.delete(id);
     if (!deleted) throw new Error(`Failed to delete export order item with id ${id}`);

@@ -8,12 +8,12 @@ type UpdateTravelPermit = Partial<Omit<NewTravelPermit, "id" | "createdAt" | "up
 export class TravelPermitService {
   constructor(private repo: TravelPermitRepository) {}
 
-  async getAll(): Promise<TravelPermit[]> {
-    return this.repo.findAll();
+  async getAll() {
+    return this.repo.findAllWithRelations();
   }
 
-  async getById(id: number): Promise<TravelPermit> {
-    const permit = await this.repo.findById(id);
+  async getById(id: number) {
+    const permit = await this.repo.findByIdWithRelations(id);
     if (!permit) throw new Error(`Travel permit with id ${id} not found`);
     return permit;
   }
@@ -45,7 +45,9 @@ export class TravelPermitService {
   }
 
   async update(id: number, data: UpdateTravelPermit): Promise<TravelPermit> {
-    await this.getById(id);
+    await this.repo.findById(id).then((p) => {
+      if (!p) throw new Error(`Travel permit with id ${id} not found`);
+    });
 
     if (data.permitNumber) {
       const existing = await this.repo.findByPermitNumber(data.permitNumber);
@@ -60,12 +62,15 @@ export class TravelPermitService {
   }
 
   async updateStatus(id: number, status: TravelPermit["status"]): Promise<TravelPermit> {
-    const permit = await this.getById(id);
+    const permit = await this.repo.findById(id);
+    if (!permit) throw new Error(`Travel permit with id ${id} not found`);
 
-    // Enforce valid status transitions: pending → received → completed
+    // Enforce valid status transitions: pending → received → validated → sent → completed
     const transitions: Record<TravelPermit["status"], TravelPermit["status"][]> = {
       pending: ["received"],
-      received: ["completed"],
+      received: ["validated"],
+      validated: ["sent"],
+      sent: ["completed"],
       completed: [],
     };
 
@@ -83,8 +88,39 @@ export class TravelPermitService {
     return updated;
   }
 
+  // "Send to Staff" action: validated → sent
+  // Requires all items to be done or cancelled — no checked/reported allowed
+  async sendToStaff(id: number, sentById: number): Promise<TravelPermit> {
+    const permit = await this.repo.findByIdWithRelations(id);
+    if (!permit) throw new Error(`Travel permit with id ${id} not found`);
+
+    if (permit.status !== "validated") {
+      throw new Error(
+        `Only validated permits can be sent to staff (current status: "${permit.status}")`
+      );
+    }
+
+    const hasUnresolved = permit.items.some(
+      (item) => item.status === "checked" || item.status === "reported"
+    );
+    if (hasUnresolved) {
+      throw new Error(
+        `Cannot send to staff: all items must be confirmed or cancelled first`
+      );
+    }
+
+    const updated = await this.repo.update(id, {
+      status: "sent",
+      sentAt: new Date(),
+      sentById,
+    });
+    if (!updated) throw new Error(`Failed to send travel permit with id ${id} to staff`);
+    return updated;
+  }
+
   async delete(id: number): Promise<TravelPermit> {
-    const permit = await this.getById(id);
+    const permit = await this.repo.findById(id);
+    if (!permit) throw new Error(`Travel permit with id ${id} not found`);
     if (permit.status !== "pending") {
       throw new Error(`Only pending travel permits can be deleted`);
     }

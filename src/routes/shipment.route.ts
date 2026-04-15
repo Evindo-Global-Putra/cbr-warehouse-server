@@ -76,7 +76,7 @@ export const shipmentRoutes = new Elysia({
       const data = await shipmentService.getByLoadingForm(params.loadingFormId);
       return { success: true, data };
     },
-    { params: t.Object({ loadingFormId: t.Numeric() }) },
+    { params: t.Object({ loadingFormId: t.String() }) },
   )
   // ─── GET /shipments/:id ───────────────────────────────────────────────────
   .get(
@@ -85,7 +85,7 @@ export const shipmentRoutes = new Elysia({
       const data = await shipmentService.getById(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) },
+    { params: t.Object({ id: t.String() }) },
   )
   // ─── POST /shipments ──────────────────────────────────────────────────────
   // Only creatable from a validated loading form
@@ -121,7 +121,7 @@ export const shipmentRoutes = new Elysia({
       const data = await shipmentService.markInTransit(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) },
+    { params: t.Object({ id: t.String() }) },
   )
   // ─── PATCH /shipments/:id/arrived ────────────────────────────────────────
   // in_transit → arrived; sets actualArrival to now
@@ -132,7 +132,7 @@ export const shipmentRoutes = new Elysia({
       const data = await shipmentService.markArrived(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) },
+    { params: t.Object({ id: t.String() }) },
   )
   // ─── PATCH /shipments/:id/delivered ──────────────────────────────────────
   // arrived → delivered
@@ -143,7 +143,7 @@ export const shipmentRoutes = new Elysia({
       const data = await shipmentService.markDelivered(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) },
+    { params: t.Object({ id: t.String() }) },
   )
   // ─── PUT /shipments/:id ───────────────────────────────────────────────────
   .put(
@@ -158,7 +158,7 @@ export const shipmentRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
       body: t.Object({
         trackingNumber: t.Optional(t.String()),
         carrier: t.Optional(t.String()),
@@ -177,5 +177,5 @@ export const shipmentRoutes = new Elysia({
       const data = await shipmentService.delete(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) },
+    { params: t.Object({ id: t.String() }) },
   );

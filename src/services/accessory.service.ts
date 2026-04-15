@@ -13,7 +13,7 @@ export class AccessoryService {
   }
 
   async getPaginated(
-    filters: { branchId?: number; category?: string; search?: string },
+    filters: { branchId?: string; category?: string; search?: string },
     page: number,
     limit: number
   ): Promise<{ data: Accessory[]; meta: { page: number; limit: number; total: number; totalPages: number } }> {
@@ -21,7 +21,7 @@ export class AccessoryService {
     return { data, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };
   }
 
-  async getById(id: number): Promise<Accessory> {
+  async getById(id: string): Promise<Accessory> {
     const item = await this.repo.findById(id);
     if (!item) throw new Error(`Accessory with id ${id} not found`);
     return item;
@@ -33,7 +33,7 @@ export class AccessoryService {
     return item;
   }
 
-  async getByBranch(branchId: number): Promise<Accessory[]> {
+  async getByBranch(branchId: string): Promise<Accessory[]> {
     return this.repo.findByBranch(branchId);
   }
 
@@ -45,7 +45,7 @@ export class AccessoryService {
     return this.repo.create(data);
   }
 
-  async update(id: number, data: UpdateAccessory): Promise<Accessory> {
+  async update(id: string, data: UpdateAccessory): Promise<Accessory> {
     await this.getById(id);
     const updated = await this.repo.update(id, data);
     if (!updated) throw new Error(`Failed to update accessory with id ${id}`);
@@ -53,7 +53,7 @@ export class AccessoryService {
   }
 
   // delta > 0 = add stock, delta < 0 = deduct stock
-  async adjustStock(id: number, delta: number): Promise<Accessory> {
+  async adjustStock(id: string, delta: number): Promise<Accessory> {
     const item = await this.getById(id);
     if (item.quantityInStock + delta < 0) {
       throw new Error(
@@ -65,7 +65,7 @@ export class AccessoryService {
     return updated;
   }
 
-  async delete(id: number): Promise<Accessory> {
+  async delete(id: string): Promise<Accessory> {
     await this.getById(id);
     const deleted = await this.repo.delete(id);
     if (!deleted) throw new Error(`Failed to delete accessory with id ${id}`);

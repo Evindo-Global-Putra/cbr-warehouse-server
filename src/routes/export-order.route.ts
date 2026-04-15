@@ -75,7 +75,7 @@ export const exportOrderRoutes = new Elysia({
       const data = await exportOrderService.getByClient(params.clientId);
       return { success: true, data };
     },
-    { params: t.Object({ clientId: t.Numeric() }) },
+    { params: t.Object({ clientId: t.String() }) },
   )
   // ─── GET /export-orders/branch/:branchId ─────────────────────────────────
   .get(
@@ -84,7 +84,7 @@ export const exportOrderRoutes = new Elysia({
       const data = await exportOrderService.getByBranch(params.branchId);
       return { success: true, data };
     },
-    { params: t.Object({ branchId: t.Numeric() }) },
+    { params: t.Object({ branchId: t.String() }) },
   )
   // ─── GET /export-orders/:id ───────────────────────────────────────────────
   .get(
@@ -93,7 +93,7 @@ export const exportOrderRoutes = new Elysia({
       const data = await exportOrderService.getById(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) },
+    { params: t.Object({ id: t.String() }) },
   )
   // ─── POST /export-orders ──────────────────────────────────────────────────
   .post(
@@ -107,11 +107,11 @@ export const exportOrderRoutes = new Elysia({
     {
       body: t.Object({
         orderNumber: t.String(),
-        clientId: t.Number(),
-        branchId: t.Number(),
+        clientId: t.String(),
+        branchId: t.String(),
         requestedUnits: t.Number({ minimum: 1 }),
         notes: t.Optional(t.String()),
-        createdById: t.Optional(t.Number()),
+        createdById: t.Optional(t.String()),
       }),
     },
   )
@@ -124,7 +124,7 @@ export const exportOrderRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
       body: t.Object({
         status: t.Union(exportOrderStatusValues.map((s) => t.Literal(s))),
       }),
@@ -139,14 +139,14 @@ export const exportOrderRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
       body: t.Object({
         orderNumber: t.Optional(t.String()),
-        clientId: t.Optional(t.Number()),
-        branchId: t.Optional(t.Number()),
+        clientId: t.Optional(t.String()),
+        branchId: t.Optional(t.String()),
         requestedUnits: t.Optional(t.Number({ minimum: 1 })),
         notes: t.Optional(t.String()),
-        createdById: t.Optional(t.Number()),
+        createdById: t.Optional(t.String()),
       }),
     },
   )
@@ -158,5 +158,5 @@ export const exportOrderRoutes = new Elysia({
       const data = await exportOrderService.delete(params.id);
       return { success: true, data };
     },
-    { params: t.Object({ id: t.Numeric() }) },
+    { params: t.Object({ id: t.String() }) },
   );

@@ -21,8 +21,8 @@ export class WarehouseEntryRepository {
   async findPaginated(
     filters: {
       status?: WarehouseEntry["status"];
-      branchId?: number;
-      travelPermitId?: number;
+      branchId?: string;
+      travelPermitId?: string;
     },
     page: number,
     limit: number
@@ -41,7 +41,7 @@ export class WarehouseEntryRepository {
     return { data, total: Number(total) };
   }
 
-  async findById(id: number): Promise<WarehouseEntry | undefined> {
+  async findById(id: string): Promise<WarehouseEntry | undefined> {
     const result = await this.db
       .select()
       .from(warehouseEntries)
@@ -49,14 +49,14 @@ export class WarehouseEntryRepository {
     return result[0];
   }
 
-  async findByTravelPermit(travelPermitId: number): Promise<WarehouseEntry[]> {
+  async findByTravelPermit(travelPermitId: string): Promise<WarehouseEntry[]> {
     return this.db
       .select()
       .from(warehouseEntries)
       .where(eq(warehouseEntries.travelPermitId, travelPermitId));
   }
 
-  async findByBranch(branchId: number): Promise<WarehouseEntry[]> {
+  async findByBranch(branchId: string): Promise<WarehouseEntry[]> {
     return this.db
       .select()
       .from(warehouseEntries)
@@ -81,7 +81,7 @@ export class WarehouseEntryRepository {
   }
 
   async update(
-    id: number,
+    id: string,
     data: UpdateWarehouseEntry
   ): Promise<WarehouseEntry | undefined> {
     const result = await this.db
@@ -93,7 +93,7 @@ export class WarehouseEntryRepository {
   }
 
   // Atomically increment totalUnitsScanned by 1
-  async incrementScanned(id: number): Promise<WarehouseEntry | undefined> {
+  async incrementScanned(id: string): Promise<WarehouseEntry | undefined> {
     const result = await this.db
       .update(warehouseEntries)
       .set({
@@ -104,7 +104,7 @@ export class WarehouseEntryRepository {
     return result[0];
   }
 
-  async delete(id: number): Promise<WarehouseEntry | undefined> {
+  async delete(id: string): Promise<WarehouseEntry | undefined> {
     const result = await this.db
       .delete(warehouseEntries)
       .where(eq(warehouseEntries.id, id))

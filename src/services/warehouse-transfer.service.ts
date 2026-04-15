@@ -17,17 +17,17 @@ export class WarehouseTransferService {
     return this.repo.findAll();
   }
 
-  async getById(id: number): Promise<WarehouseTransfer> {
+  async getById(id: string): Promise<WarehouseTransfer> {
     const transfer = await this.repo.findById(id);
     if (!transfer) throw new Error(`Warehouse transfer with id ${id} not found`);
     return transfer;
   }
 
-  async getByFromBranch(fromBranchId: number): Promise<WarehouseTransfer[]> {
+  async getByFromBranch(fromBranchId: string): Promise<WarehouseTransfer[]> {
     return this.repo.findByFromBranch(fromBranchId);
   }
 
-  async getByToBranch(toBranchId: number): Promise<WarehouseTransfer[]> {
+  async getByToBranch(toBranchId: string): Promise<WarehouseTransfer[]> {
     return this.repo.findByToBranch(toBranchId);
   }
 
@@ -42,7 +42,7 @@ export class WarehouseTransferService {
     return this.repo.create(data);
   }
 
-  async markInTransit(id: number): Promise<WarehouseTransfer> {
+  async markInTransit(id: string): Promise<WarehouseTransfer> {
     const transfer = await this.getById(id);
     if (transfer.status !== "pending") {
       throw new Error(
@@ -61,7 +61,7 @@ export class WarehouseTransferService {
     return updated;
   }
 
-  async complete(id: number): Promise<WarehouseTransfer> {
+  async complete(id: string): Promise<WarehouseTransfer> {
     const transfer = await this.getById(id);
     if (transfer.status !== "in_transit") {
       throw new Error(
@@ -86,7 +86,7 @@ export class WarehouseTransferService {
     return updated;
   }
 
-  async cancel(id: number): Promise<WarehouseTransfer> {
+  async cancel(id: string): Promise<WarehouseTransfer> {
     const transfer = await this.getById(id);
     if (transfer.status === "completed" || transfer.status === "cancelled") {
       throw new Error(
@@ -107,7 +107,7 @@ export class WarehouseTransferService {
     return updated;
   }
 
-  async delete(id: number): Promise<WarehouseTransfer> {
+  async delete(id: string): Promise<WarehouseTransfer> {
     const transfer = await this.getById(id);
     if (transfer.status !== "pending") {
       throw new Error(

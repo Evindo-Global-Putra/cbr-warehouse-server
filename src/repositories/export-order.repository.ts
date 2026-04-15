@@ -15,7 +15,7 @@ export class ExportOrderRepository {
     return this.db.select().from(exportOrders);
   }
 
-  async findById(id: number): Promise<ExportOrder | undefined> {
+  async findById(id: string): Promise<ExportOrder | undefined> {
     const result = await this.db
       .select()
       .from(exportOrders)
@@ -31,14 +31,14 @@ export class ExportOrderRepository {
     return result[0];
   }
 
-  async findByClient(clientId: number): Promise<ExportOrder[]> {
+  async findByClient(clientId: string): Promise<ExportOrder[]> {
     return this.db
       .select()
       .from(exportOrders)
       .where(eq(exportOrders.clientId, clientId));
   }
 
-  async findByBranch(branchId: number): Promise<ExportOrder[]> {
+  async findByBranch(branchId: string): Promise<ExportOrder[]> {
     return this.db
       .select()
       .from(exportOrders)
@@ -57,7 +57,7 @@ export class ExportOrderRepository {
     return result[0];
   }
 
-  async update(id: number, data: UpdateExportOrder): Promise<ExportOrder | undefined> {
+  async update(id: string, data: UpdateExportOrder): Promise<ExportOrder | undefined> {
     const result = await this.db
       .update(exportOrders)
       .set({ ...data, updatedAt: new Date() })
@@ -66,7 +66,7 @@ export class ExportOrderRepository {
     return result[0];
   }
 
-  async delete(id: number): Promise<ExportOrder | undefined> {
+  async delete(id: string): Promise<ExportOrder | undefined> {
     const result = await this.db
       .delete(exportOrders)
       .where(eq(exportOrders.id, id))

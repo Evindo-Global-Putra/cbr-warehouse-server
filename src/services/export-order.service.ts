@@ -23,7 +23,7 @@ export class ExportOrderService {
     return this.repo.findAll();
   }
 
-  async getById(id: number): Promise<ExportOrder> {
+  async getById(id: string): Promise<ExportOrder> {
     const order = await this.repo.findById(id);
     if (!order) throw new Error(`Export order with id ${id} not found`);
     return order;
@@ -35,11 +35,11 @@ export class ExportOrderService {
     return order;
   }
 
-  async getByClient(clientId: number): Promise<ExportOrder[]> {
+  async getByClient(clientId: string): Promise<ExportOrder[]> {
     return this.repo.findByClient(clientId);
   }
 
-  async getByBranch(branchId: number): Promise<ExportOrder[]> {
+  async getByBranch(branchId: string): Promise<ExportOrder[]> {
     return this.repo.findByBranch(branchId);
   }
 
@@ -55,7 +55,7 @@ export class ExportOrderService {
     return this.repo.create(data);
   }
 
-  async updateStatus(id: number, newStatus: ExportOrder["status"]): Promise<ExportOrder> {
+  async updateStatus(id: string, newStatus: ExportOrder["status"]): Promise<ExportOrder> {
     const order = await this.getById(id);
     const allowed = STATUS_TRANSITIONS[order.status];
     if (!allowed.includes(newStatus)) {
@@ -68,14 +68,14 @@ export class ExportOrderService {
     return updated;
   }
 
-  async update(id: number, data: UpdateExportOrder): Promise<ExportOrder> {
+  async update(id: string, data: UpdateExportOrder): Promise<ExportOrder> {
     await this.getById(id);
     const updated = await this.repo.update(id, data);
     if (!updated) throw new Error(`Failed to update export order with id ${id}`);
     return updated;
   }
 
-  async delete(id: number): Promise<ExportOrder> {
+  async delete(id: string): Promise<ExportOrder> {
     const order = await this.getById(id);
     if (order.status !== "pending") {
       throw new Error(

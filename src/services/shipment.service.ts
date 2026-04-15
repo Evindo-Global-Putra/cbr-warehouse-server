@@ -16,13 +16,13 @@ export class ShipmentService {
     return this.repo.findAll();
   }
 
-  async getById(id: number): Promise<Shipment> {
+  async getById(id: string): Promise<Shipment> {
     const shipment = await this.repo.findById(id);
     if (!shipment) throw new Error(`Shipment with id ${id} not found`);
     return shipment;
   }
 
-  async getByLoadingForm(loadingFormId: number): Promise<Shipment[]> {
+  async getByLoadingForm(loadingFormId: string): Promise<Shipment[]> {
     return this.repo.findByLoadingForm(loadingFormId);
   }
 
@@ -51,7 +51,7 @@ export class ShipmentService {
     return this.repo.create(data);
   }
 
-  async markInTransit(id: number): Promise<Shipment> {
+  async markInTransit(id: string): Promise<Shipment> {
     const shipment = await this.getById(id);
     if (shipment.status !== "pending") {
       throw new Error(
@@ -66,7 +66,7 @@ export class ShipmentService {
     return updated;
   }
 
-  async markArrived(id: number): Promise<Shipment> {
+  async markArrived(id: string): Promise<Shipment> {
     const shipment = await this.getById(id);
     if (shipment.status !== "in_transit") {
       throw new Error(
@@ -81,7 +81,7 @@ export class ShipmentService {
     return updated;
   }
 
-  async markDelivered(id: number): Promise<Shipment> {
+  async markDelivered(id: string): Promise<Shipment> {
     const shipment = await this.getById(id);
     if (shipment.status !== "arrived") {
       throw new Error(
@@ -93,14 +93,14 @@ export class ShipmentService {
     return updated;
   }
 
-  async update(id: number, data: UpdateShipment): Promise<Shipment> {
+  async update(id: string, data: UpdateShipment): Promise<Shipment> {
     await this.getById(id);
     const updated = await this.repo.update(id, data);
     if (!updated) throw new Error(`Failed to update shipment with id ${id}`);
     return updated;
   }
 
-  async delete(id: number): Promise<Shipment> {
+  async delete(id: string): Promise<Shipment> {
     const shipment = await this.getById(id);
     if (shipment.status !== "pending") {
       throw new Error(

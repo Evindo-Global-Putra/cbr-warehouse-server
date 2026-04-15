@@ -16,17 +16,17 @@ export class LoadingFormService {
     return this.repo.findAll();
   }
 
-  async getById(id: number): Promise<LoadingForm> {
+  async getById(id: string): Promise<LoadingForm> {
     const form = await this.repo.findById(id);
     if (!form) throw new Error(`Loading form with id ${id} not found`);
     return form;
   }
 
-  async getByExportOrder(exportOrderId: number): Promise<LoadingForm[]> {
+  async getByExportOrder(exportOrderId: string): Promise<LoadingForm[]> {
     return this.repo.findByExportOrder(exportOrderId);
   }
 
-  async getByBranch(branchId: number): Promise<LoadingForm[]> {
+  async getByBranch(branchId: string): Promise<LoadingForm[]> {
     return this.repo.findByBranch(branchId);
   }
 
@@ -48,7 +48,7 @@ export class LoadingFormService {
   }
 
   // Advance draft → confirmed
-  async confirm(id: number): Promise<LoadingForm> {
+  async confirm(id: string): Promise<LoadingForm> {
     const form = await this.getById(id);
     if (form.status !== "draft") {
       throw new Error(
@@ -61,7 +61,7 @@ export class LoadingFormService {
   }
 
   // Advance confirmed → validated; also update the linked export order to 'loading'
-  async validate(id: number, validatedById: number): Promise<LoadingForm> {
+  async validate(id: string, validatedById: string): Promise<LoadingForm> {
     const form = await this.getById(id);
     if (form.status !== "confirmed") {
       throw new Error(
@@ -81,7 +81,7 @@ export class LoadingFormService {
     return updated;
   }
 
-  async update(id: number, data: UpdateLoadingForm): Promise<LoadingForm> {
+  async update(id: string, data: UpdateLoadingForm): Promise<LoadingForm> {
     const form = await this.getById(id);
     if (form.status !== "draft") {
       throw new Error(
@@ -93,7 +93,7 @@ export class LoadingFormService {
     return updated;
   }
 
-  async delete(id: number): Promise<LoadingForm> {
+  async delete(id: string): Promise<LoadingForm> {
     const form = await this.getById(id);
     if (form.status !== "draft") {
       throw new Error(

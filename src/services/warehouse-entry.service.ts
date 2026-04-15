@@ -15,7 +15,7 @@ export class WarehouseEntryService {
   }
 
   async getPaginated(
-    filters: { status?: WarehouseEntry["status"]; branchId?: number; travelPermitId?: number },
+    filters: { status?: WarehouseEntry["status"]; branchId?: string; travelPermitId?: string },
     page: number,
     limit: number
   ): Promise<{ data: WarehouseEntry[]; meta: { page: number; limit: number; total: number; totalPages: number } }> {
@@ -23,17 +23,17 @@ export class WarehouseEntryService {
     return { data, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };
   }
 
-  async getById(id: number): Promise<WarehouseEntry> {
+  async getById(id: string): Promise<WarehouseEntry> {
     const entry = await this.repo.findById(id);
     if (!entry) throw new Error(`Warehouse entry with id ${id} not found`);
     return entry;
   }
 
-  async getByTravelPermit(travelPermitId: number): Promise<WarehouseEntry[]> {
+  async getByTravelPermit(travelPermitId: string): Promise<WarehouseEntry[]> {
     return this.repo.findByTravelPermit(travelPermitId);
   }
 
-  async getByBranch(branchId: number): Promise<WarehouseEntry[]> {
+  async getByBranch(branchId: string): Promise<WarehouseEntry[]> {
     return this.repo.findByBranch(branchId);
   }
 
@@ -55,7 +55,7 @@ export class WarehouseEntryService {
 
   // Called each time a motorcycle unit is successfully scanned.
   // Auto-completes the entry session when all expected units are scanned.
-  async incrementScanned(id: number): Promise<WarehouseEntry> {
+  async incrementScanned(id: string): Promise<WarehouseEntry> {
     const entry = await this.getById(id);
 
     if (entry.status === "completed") {
@@ -73,7 +73,7 @@ export class WarehouseEntryService {
     return updated;
   }
 
-  async complete(id: number): Promise<WarehouseEntry> {
+  async complete(id: string): Promise<WarehouseEntry> {
     const entry = await this.getById(id);
     if (entry.status === "completed") {
       throw new Error(`Warehouse entry with id ${id} is already completed`);
@@ -87,14 +87,14 @@ export class WarehouseEntryService {
     return updated;
   }
 
-  async update(id: number, data: UpdateWarehouseEntry): Promise<WarehouseEntry> {
+  async update(id: string, data: UpdateWarehouseEntry): Promise<WarehouseEntry> {
     await this.getById(id);
     const updated = await this.repo.update(id, data);
     if (!updated) throw new Error(`Failed to update warehouse entry with id ${id}`);
     return updated;
   }
 
-  async delete(id: number): Promise<WarehouseEntry> {
+  async delete(id: string): Promise<WarehouseEntry> {
     const entry = await this.getById(id);
     if (entry.status === "completed") {
       throw new Error(`Completed warehouse entries cannot be deleted`);

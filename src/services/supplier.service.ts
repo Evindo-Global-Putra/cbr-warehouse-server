@@ -12,7 +12,7 @@ export class SupplierService {
     return this.supplierRepo.findAll();
   }
 
-  async getById(id: number): Promise<Supplier> {
+  async getById(id: string): Promise<Supplier> {
     const supplier = await this.supplierRepo.findById(id);
     if (!supplier) throw new Error(`Supplier with id ${id} not found`);
     return supplier;
@@ -30,14 +30,14 @@ export class SupplierService {
     return this.supplierRepo.create(data);
   }
 
-  async update(id: number, data: UpdateSupplier): Promise<Supplier> {
+  async update(id: string, data: UpdateSupplier): Promise<Supplier> {
     await this.getById(id);
     const updated = await this.supplierRepo.update(id, data);
     if (!updated) throw new Error(`Failed to update supplier with id ${id}`);
     return updated;
   }
 
-  async delete(id: number): Promise<Supplier> {
+  async delete(id: string): Promise<Supplier> {
     await this.getById(id);
     const deleted = await this.supplierRepo.delete(id);
     if (!deleted) throw new Error(`Failed to delete supplier with id ${id}`);

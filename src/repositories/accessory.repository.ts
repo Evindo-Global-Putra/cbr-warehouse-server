@@ -17,7 +17,7 @@ export class AccessoryRepository {
   }
 
   async findPaginated(
-    filters: { branchId?: number; category?: string; search?: string },
+    filters: { branchId?: string; category?: string; search?: string },
     page: number,
     limit: number
   ): Promise<{ data: Accessory[]; total: number }> {
@@ -43,7 +43,7 @@ export class AccessoryRepository {
     return { data, total: Number(total) };
   }
 
-  async findById(id: number): Promise<Accessory | undefined> {
+  async findById(id: string): Promise<Accessory | undefined> {
     const result = await this.db
       .select()
       .from(accessories)
@@ -59,7 +59,7 @@ export class AccessoryRepository {
     return result[0];
   }
 
-  async findByBranch(branchId: number): Promise<Accessory[]> {
+  async findByBranch(branchId: string): Promise<Accessory[]> {
     return this.db
       .select()
       .from(accessories)
@@ -71,7 +71,7 @@ export class AccessoryRepository {
     return result[0];
   }
 
-  async update(id: number, data: UpdateAccessory): Promise<Accessory | undefined> {
+  async update(id: string, data: UpdateAccessory): Promise<Accessory | undefined> {
     const result = await this.db
       .update(accessories)
       .set({ ...data, updatedAt: new Date() })
@@ -81,7 +81,7 @@ export class AccessoryRepository {
   }
 
   // Atomically adjust quantityInStock by delta (positive = add, negative = deduct)
-  async adjustStock(id: number, delta: number): Promise<Accessory | undefined> {
+  async adjustStock(id: string, delta: number): Promise<Accessory | undefined> {
     const result = await this.db
       .update(accessories)
       .set({
@@ -93,7 +93,7 @@ export class AccessoryRepository {
     return result[0];
   }
 
-  async delete(id: number): Promise<Accessory | undefined> {
+  async delete(id: string): Promise<Accessory | undefined> {
     const result = await this.db
       .delete(accessories)
       .where(eq(accessories.id, id))
