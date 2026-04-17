@@ -201,7 +201,7 @@ export const travelPermitItems = pgTable("travel_permit_items", {
   motorcycleTypeId: uuid("motorcycle_type_id")
     .notNull()
     .references(() => motorcycleTypes.id),
-  nospk: varchar("nospk", { length: 50 }),                         // reference code from surat jalan
+  nospk: varchar("nospk", { length: 50 }),                        // reference code from surat jalan
   color: varchar("color", { length: 50 }).notNull(),
   frameNumber: varchar("frame_number", { length: 50 }).notNull(),  // preliminary chassis number from paper
   engineNumber: varchar("engine_number", { length: 50 }).notNull(), // preliminary engine number from paper

@@ -52,7 +52,7 @@ export const warehouseTransferMotorcycleRoutes = new Elysia({
   .get(
     "/transfer/:transferId",
     async ({ params }) => {
-      const data = await wtmService.getByTransfer(params.transferId);
+      const data = await wtmService.getByTransfer(params.transferId );
       return { success: true, data };
     },
     { params: t.Object({ transferId: t.Numeric() }) },

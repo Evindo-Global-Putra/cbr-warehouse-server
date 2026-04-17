@@ -15,11 +15,11 @@ export class TravelPermitItemService {
     private permitRepo: TravelPermitRepository,
   ) {}
 
-  async getByPermitId(permitId: number): Promise<TravelPermitItem[]> {
+  async getByPermitId(permitId: string): Promise<TravelPermitItem[]> {
     return this.itemRepo.findByTravelPermitId(permitId);
   }
 
-  async getById(permitId: number, itemId: number): Promise<TravelPermitItem> {
+  async getById(permitId: string, itemId: string): Promise<TravelPermitItem> {
     const item = await this.itemRepo.findById(itemId);
     if (!item || item.travelPermitId !== permitId) {
       throw new Error(`Travel permit item with id ${itemId} not found`);
@@ -28,7 +28,7 @@ export class TravelPermitItemService {
   }
 
   async create(
-    permitId: number,
+    permitId: string,
     data: Omit<NewTravelPermitItem, "travelPermitId">
   ): Promise<TravelPermitItem> {
     const permit = await this.permitRepo.findById(permitId);
@@ -42,8 +42,8 @@ export class TravelPermitItemService {
   }
 
   async update(
-    permitId: number,
-    itemId: number,
+    permitId: string,
+    itemId: string,
     data: Partial<Pick<TravelPermitItem, "motorcycleTypeId" | "color" | "quantity" | "notes">>
   ): Promise<TravelPermitItem> {
     const item = await this.getById(permitId, itemId);
@@ -56,8 +56,8 @@ export class TravelPermitItemService {
   }
 
   async updateStatus(
-    permitId: number,
-    itemId: number,
+    permitId: string,
+    itemId: string,
     status: TravelPermitItemStatus
   ): Promise<TravelPermitItem> {
     const item = await this.getById(permitId, itemId);
@@ -85,7 +85,7 @@ export class TravelPermitItemService {
     return updated;
   }
 
-  async delete(permitId: number, itemId: number): Promise<TravelPermitItem> {
+  async delete(permitId: string, itemId: string): Promise<TravelPermitItem> {
     const item = await this.getById(permitId, itemId);
     if (item.status !== "checked") {
       throw new Error(`Only checked items can be deleted`);
@@ -95,14 +95,14 @@ export class TravelPermitItemService {
     return deleted;
   }
 
-  async getReportsByItemId(permitId: number, itemId: number) {
+  async getReportsByItemId(permitId: string, itemId: string) {
     await this.getById(permitId, itemId); // ownership check
     return this.reportRepo.findByItemId(itemId);
   }
 
   async createReport(
-    permitId: number,
-    itemId: number,
+    permitId: string,
+    itemId: string,
     data: Omit<NewReport, "travelPermitItemId">
   ) {
     await this.getById(permitId, itemId); // ownership check
@@ -110,7 +110,7 @@ export class TravelPermitItemService {
   }
 
   // Auto-transition permit from received → validated when all items are resolved
-  private async tryAutoValidatePermit(permitId: number): Promise<void> {
+  private async tryAutoValidatePermit(permitId: string): Promise<void> {
     const permit = await this.permitRepo.findById(permitId);
     if (!permit || permit.status !== "received") return;
 

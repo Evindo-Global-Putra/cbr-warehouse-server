@@ -111,7 +111,7 @@ export const travelPermitRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ supplierId: t.Numeric() }),
+      params: t.Object({ supplierId: t.String() }),
     },
   )
   // ─── GET /travel-permits/branch/:branchId ────────────────────────────────
@@ -122,7 +122,7 @@ export const travelPermitRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ branchId: t.Numeric() }),
+      params: t.Object({ branchId: t.String() }),
     },
   )
   // ─── GET /travel-permits/permit/:permitNumber ─────────────────────────────
@@ -146,7 +146,7 @@ export const travelPermitRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
     },
   )
   // ─── POST /travel-permits ─────────────────────────────────────────────────
@@ -164,14 +164,14 @@ export const travelPermitRoutes = new Elysia({
     {
       body: t.Object({
         permitNumber: t.String({ minLength: 1 }),
-        supplierId: t.Number(),
-        branchId: t.Number(),
+        supplierId: t.String(),
+        branchId: t.String(),
         totalUnits: t.Number({ minimum: 1 }),
         truckPoliceNumber: t.Optional(t.String()),
         driverName: t.Optional(t.String()),
         issuedDate: t.Optional(t.String()),
         notes: t.Optional(t.String()),
-        createdById: t.Optional(t.Number()),
+        createdById: t.Optional(t.String()),
       }),
     },
   )
@@ -185,7 +185,7 @@ export const travelPermitRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
       body: t.Object({ status: statusEnum }),
     },
   )
@@ -203,7 +203,7 @@ export const travelPermitRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
     },
   )
   // ─── PUT /travel-permits/:id ──────────────────────────────────────────────
@@ -219,11 +219,11 @@ export const travelPermitRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
       body: t.Object({
         permitNumber: t.Optional(t.String({ minLength: 1 })),
-        supplierId: t.Optional(t.Number()),
-        branchId: t.Optional(t.Number()),
+        supplierId: t.Optional(t.String()),
+        branchId: t.Optional(t.String()),
         totalUnits: t.Optional(t.Number({ minimum: 1 })),
         truckPoliceNumber: t.Optional(t.String()),
         driverName: t.Optional(t.String()),
@@ -243,7 +243,7 @@ export const travelPermitRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
     },
   )
 
@@ -259,7 +259,7 @@ export const travelPermitRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
     },
   )
   // ─── POST /travel-permits/:id/items ──────────────────────────────────────
@@ -272,11 +272,16 @@ export const travelPermitRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric() }),
+      params: t.Object({ id: t.String() }),
       body: t.Object({
-        motorcycleTypeId: t.Number(),
+        motorcycleTypeId: t.String(),
         color: t.String({ minLength: 1 }),
+        frameNumber: t.String({ minLength: 1 }),
+        engineNumber: t.String({ minLength: 1 }),
         quantity: t.Number({ minimum: 1 }),
+        nospk: t.Optional(t.String()),
+        destinationCode: t.Optional(t.String()),
+        year: t.Optional(t.Number()),
         notes: t.Optional(t.String()),
       }),
     },
@@ -294,9 +299,9 @@ export const travelPermitRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric(), itemId: t.Numeric() }),
+      params: t.Object({ id: t.String(), itemId: t.String() }),
       body: t.Object({
-        motorcycleTypeId: t.Optional(t.Number()),
+        motorcycleTypeId: t.Optional(t.String()),
         color: t.Optional(t.String({ minLength: 1 })),
         quantity: t.Optional(t.Number({ minimum: 1 })),
         notes: t.Optional(t.String()),
@@ -316,7 +321,7 @@ export const travelPermitRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric(), itemId: t.Numeric() }),
+      params: t.Object({ id: t.String(), itemId: t.String() }),
       body: t.Object({ status: itemStatusEnum }),
     },
   )
@@ -332,7 +337,7 @@ export const travelPermitRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric(), itemId: t.Numeric() }),
+      params: t.Object({ id: t.String(), itemId: t.String() }),
     },
   )
 
@@ -351,7 +356,7 @@ export const travelPermitRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric(), itemId: t.Numeric() }),
+      params: t.Object({ id: t.String(), itemId: t.String() }),
     },
   )
   // ─── POST /travel-permits/:id/items/:itemId/reports ───────────────────────
@@ -368,7 +373,7 @@ export const travelPermitRoutes = new Elysia({
       return { success: true, data };
     },
     {
-      params: t.Object({ id: t.Numeric(), itemId: t.Numeric() }),
+      params: t.Object({ id: t.String(), itemId: t.String() }),
       body: t.Object({
         reason: reportReasonEnum,
         quantityAffected: t.Number({ minimum: 1 }),

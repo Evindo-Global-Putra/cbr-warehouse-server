@@ -12,7 +12,7 @@ export class TravelPermitService {
     return this.repo.findAllWithRelations();
   }
 
-  async getById(id: number) {
+  async getById(id: string) {
     const permit = await this.repo.findByIdWithRelations(id);
     if (!permit) throw new Error(`Travel permit with id ${id} not found`);
     return permit;
@@ -24,11 +24,11 @@ export class TravelPermitService {
     return permit;
   }
 
-  async getBySupplier(supplierId: number): Promise<TravelPermit[]> {
+  async getBySupplier(supplierId: string): Promise<TravelPermit[]> {
     return this.repo.findBySupplier(supplierId);
   }
 
-  async getByBranch(branchId: number): Promise<TravelPermit[]> {
+  async getByBranch(branchId: string): Promise<TravelPermit[]> {
     return this.repo.findByBranch(branchId);
   }
 
@@ -44,7 +44,7 @@ export class TravelPermitService {
     return this.repo.create(data);
   }
 
-  async update(id: number, data: UpdateTravelPermit): Promise<TravelPermit> {
+  async update(id: string, data: UpdateTravelPermit): Promise<TravelPermit> {
     await this.repo.findById(id).then((p) => {
       if (!p) throw new Error(`Travel permit with id ${id} not found`);
     });
@@ -61,7 +61,7 @@ export class TravelPermitService {
     return updated;
   }
 
-  async updateStatus(id: number, status: TravelPermit["status"]): Promise<TravelPermit> {
+  async updateStatus(id: string, status: TravelPermit["status"]): Promise<TravelPermit> {
     const permit = await this.repo.findById(id);
     if (!permit) throw new Error(`Travel permit with id ${id} not found`);
 
@@ -90,7 +90,7 @@ export class TravelPermitService {
 
   // "Send to Staff" action: validated → sent
   // Requires all items to be done or cancelled — no checked/reported allowed
-  async sendToStaff(id: number, sentById: number): Promise<TravelPermit> {
+  async sendToStaff(id: string, sentById: string): Promise<TravelPermit> {
     const permit = await this.repo.findByIdWithRelations(id);
     if (!permit) throw new Error(`Travel permit with id ${id} not found`);
 
@@ -118,7 +118,7 @@ export class TravelPermitService {
     return updated;
   }
 
-  async delete(id: number): Promise<TravelPermit> {
+  async delete(id: string): Promise<TravelPermit> {
     const permit = await this.repo.findById(id);
     if (!permit) throw new Error(`Travel permit with id ${id} not found`);
     if (permit.status !== "pending") {
