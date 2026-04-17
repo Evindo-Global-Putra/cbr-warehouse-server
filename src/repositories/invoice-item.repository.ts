@@ -19,7 +19,7 @@ export class InvoiceItemRepository {
     const result = await this.db
       .select()
       .from(invoiceItems)
-      .where(eq(invoiceItems.id, id));
+      .where(eq(invoiceItems.id, id as string));
     return result[0];
   }
 

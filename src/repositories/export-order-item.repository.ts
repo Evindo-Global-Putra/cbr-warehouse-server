@@ -19,7 +19,7 @@ export class ExportOrderItemRepository {
     const result = await this.db
       .select()
       .from(exportOrderItems)
-      .where(eq(exportOrderItems.id, id));
+      .where(eq(exportOrderItems.id, id as string));
     return result[0];
   }
 

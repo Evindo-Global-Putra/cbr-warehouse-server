@@ -18,7 +18,7 @@ export class PaymentRepository {
     const result = await this.db
       .select()
       .from(payments)
-      .where(eq(payments.id, id));
+      .where(eq(payments.id, id as string));
     return result[0];
   }
 

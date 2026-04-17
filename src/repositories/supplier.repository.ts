@@ -19,7 +19,7 @@ export class SupplierRepository {
     const result = await this.db
       .select()
       .from(suppliers)
-      .where(eq(suppliers.id, id));
+      .where(eq(suppliers.id, id as string));
     return result[0];
   }
 

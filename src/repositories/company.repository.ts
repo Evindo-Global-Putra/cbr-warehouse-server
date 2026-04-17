@@ -19,7 +19,7 @@ export class CompanyRepository {
     const result = await this.db
       .select()
       .from(companies)
-      .where(eq(companies.id, id));
+      .where(eq(companies.id, id as string));
     return result[0];
   }
 

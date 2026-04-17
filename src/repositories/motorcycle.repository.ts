@@ -31,8 +31,8 @@ export class MotorcycleRepository {
   ): Promise<{ data: Motorcycle[]; total: number }> {
     const conditions: SQL[] = [];
     if (filters.status) conditions.push(eq(motorcycles.status, filters.status));
-    if (filters.branchId) conditions.push(eq(motorcycles.branchId, filters.branchId));
-    if (filters.typeId) conditions.push(eq(motorcycles.typeId, filters.typeId));
+    if (filters.branchId) conditions.push(eq(motorcycles.branchId, filters.branchId as string));
+    if (filters.typeId) conditions.push(eq(motorcycles.typeId, filters.typeId as string));
     if (filters.color) conditions.push(ilike(motorcycles.color, `%${filters.color}%`));
     if (filters.search) {
       const pattern = `%${filters.search}%`;

@@ -19,7 +19,7 @@ export class PackingListItemRepository {
     const result = await this.db
       .select()
       .from(packingListItems)
-      .where(eq(packingListItems.id, id));
+      .where(eq(packingListItems.id, id as string));
     return result[0];
   }
 

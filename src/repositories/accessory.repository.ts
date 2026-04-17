@@ -22,7 +22,7 @@ export class AccessoryRepository {
     limit: number
   ): Promise<{ data: Accessory[]; total: number }> {
     const conditions: SQL[] = [];
-    if (filters.branchId) conditions.push(eq(accessories.branchId, filters.branchId));
+    if (filters.branchId) conditions.push(eq(accessories.branchId, filters.branchId as string));
     if (filters.category) conditions.push(ilike(accessories.category, filters.category));
     if (filters.search) {
       const pattern = `%${filters.search}%`;

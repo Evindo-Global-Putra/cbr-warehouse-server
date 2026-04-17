@@ -14,7 +14,7 @@ export class TravelPermitItemReportRepository {
     return this.db
       .select()
       .from(travelPermitItemReports)
-      .where(eq(travelPermitItemReports.travelPermitItemId, travelPermitItemId));
+      .where(eq(travelPermitItemReports.travelPermitItemId, travelPermitItemId as string));
   }
 
   async create(data: NewTravelPermitItemReport): Promise<TravelPermitItemReport> {

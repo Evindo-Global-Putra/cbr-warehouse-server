@@ -40,7 +40,7 @@ export class BranchRepository {
     const result = await this.db
       .update(branches)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(branches.id, id))
+      .where(eq(branches.id, id as string))
       .returning();
     return result[0];
   }
@@ -48,7 +48,7 @@ export class BranchRepository {
   async delete(id: string): Promise<Branch | undefined> {
     const result = await this.db
       .delete(branches)
-      .where(eq(branches.id, id))
+      .where(eq(branches.id, id as string))
       .returning();
     return result[0];
   }

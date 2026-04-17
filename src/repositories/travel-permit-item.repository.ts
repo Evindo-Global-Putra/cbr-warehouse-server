@@ -17,7 +17,7 @@ export class TravelPermitItemRepository {
     return this.db
       .select()
       .from(travelPermitItems)
-      .where(eq(travelPermitItems.travelPermitId, travelPermitId));
+      .where(eq(travelPermitItems.travelPermitId, travelPermitId as string));
   }
 
   async findById(id: string): Promise<TravelPermitItem | undefined> {

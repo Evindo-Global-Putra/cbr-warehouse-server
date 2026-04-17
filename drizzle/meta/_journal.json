@@ -5,43 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1769489503701,
-      "tag": "0000_groovy_newton_destine",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1772676717584,
-      "tag": "0001_opposite_dormammu",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1774844203018,
-      "tag": "0002_quick_smasher",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1775793975723,
-      "tag": "0003_superb_micromacro",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1776221146074,
-      "tag": "0004_uneven_mauler",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1776238819282,
-      "tag": "0005_mighty_secret_warriors",
+      "when": 1776241351911,
+      "tag": "0000_unknown_loki",
       "breakpoints": true
     }
   ]

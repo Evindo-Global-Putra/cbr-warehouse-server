@@ -19,7 +19,7 @@ export class LoadingFormRepository {
     const result = await this.db
       .select()
       .from(loadingForms)
-      .where(eq(loadingForms.id, id));
+      .where(eq(loadingForms.id, id as string));
     return result[0];
   }
 
